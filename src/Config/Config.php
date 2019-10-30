@@ -24,13 +24,13 @@ class Config extends ActiveRecordConfig
     use SrFilePatcherTrait;
     const TABLE_NAME = "srfp_config";
     const PLUGIN_CLASS_NAME = ilSrFilePatcherPlugin::class;
-    const KEY_SOME = "some";
+    const KEY_PATCHING_MODE = "patching_mode";
+    const KEY_MODE_SINGLE_FILE = "single_file";
+    const KEY_MODE_ALL_FILES = "all_files";
     /**
      * @var array
      */
-    protected static $fields
-        = [
-            self::KEY_SOME => self::TYPE_STRING
-        ];
-    // TODO: Implement Config
+    protected static $fields = [
+        self::KEY_PATCHING_MODE => self::TYPE_STRING
+    ];
 }

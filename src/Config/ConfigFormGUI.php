@@ -6,7 +6,8 @@ namespace srag\Plugins\SrFilePatcher\Config;
 
 use srag\Plugins\SrFilePatcher\Utils\SrFilePatcherTrait;
 use ilSrFilePatcherPlugin;
-use ilTextInputGUI;
+use ilRadioGroupInputGUI;
+use ilRadioOption;
 use srag\ActiveRecordConfig\SrFilePatcher\ActiveRecordConfigFormGUI;
 
 /**
@@ -33,11 +34,19 @@ class ConfigFormGUI extends ActiveRecordConfigFormGUI
     protected function initFields()/*: void*/
     {
         $this->fields = [
-            Config::KEY_SOME => [
-                self::PROPERTY_CLASS    => ilTextInputGUI::class,
-                self::PROPERTY_REQUIRED => true
+            Config::KEY_PATCHING_MODE => [
+                self::PROPERTY_CLASS    => ilRadioGroupInputGUI::class,
+                self::PROPERTY_REQUIRED => true,
+                self::PROPERTY_SUBITEMS => [
+                    Config::KEY_MODE_SINGLE_FILE => [
+                        self::PROPERTY_CLASS => ilRadioOption::class
+                    ],
+                    Config::KEY_MODE_ALL_FILES => [
+                        self::PROPERTY_CLASS => ilRadioOption::class
+                    ]
+                ],
+                "setInfo" => self::txt("info_patching_mode")
             ]
         ];
-        // TODO: Implement ConfigFormGUI
     }
 }

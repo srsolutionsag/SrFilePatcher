@@ -1,3 +1,7 @@
 config_configuration#:#Configuration
 config_configuration_saved#:#Configuration saved
 config_save#:#Save
+config_patching_mode#:#Patching Mode
+config_patching_mode_single_file#:#Single File
+config_patching_mode_all_files#:#All Files
+config_info_patching_mode#:#Warning: The plugin should always be thoroughly tested on a single file before being used on all files!
