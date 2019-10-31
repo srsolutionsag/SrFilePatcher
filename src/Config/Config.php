@@ -27,10 +27,13 @@ class Config extends ActiveRecordConfig
     const KEY_PATCHING_MODE = "patching_mode";
     const KEY_MODE_SINGLE_FILE = "single_file";
     const KEY_MODE_ALL_FILES = "all_files";
+    const KEY_REF_ID_FILE = "ref_id_file";
+
     /**
      * @var array
      */
     protected static $fields = [
-        self::KEY_PATCHING_MODE => self::TYPE_STRING
+        self::KEY_PATCHING_MODE => self::TYPE_STRING,
+        self::KEY_REF_ID_FILE => self::TYPE_INTEGER
     ];
 }

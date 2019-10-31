@@ -6,6 +6,7 @@ namespace srag\Plugins\SrFilePatcher\Config;
 
 use srag\Plugins\SrFilePatcher\Utils\SrFilePatcherTrait;
 use ilSrFilePatcherPlugin;
+use ilNumberInputGUI;
 use ilRadioGroupInputGUI;
 use ilRadioOption;
 use srag\ActiveRecordConfig\SrFilePatcher\ActiveRecordConfigFormGUI;
@@ -39,10 +40,16 @@ class ConfigFormGUI extends ActiveRecordConfigFormGUI
                 self::PROPERTY_REQUIRED => true,
                 self::PROPERTY_SUBITEMS => [
                     Config::KEY_MODE_SINGLE_FILE => [
-                        self::PROPERTY_CLASS => ilRadioOption::class
+                        self::PROPERTY_CLASS    => ilRadioOption::class,
+                        self::PROPERTY_SUBITEMS => [
+                            Config::KEY_REF_ID_FILE => [
+                                self::PROPERTY_CLASS    => ilNumberInputGUI::class,
+                                self::PROPERTY_REQUIRED => true
+                            ]
+                        ]
                     ],
                     Config::KEY_MODE_ALL_FILES => [
-                        self::PROPERTY_CLASS => ilRadioOption::class
+                        self::PROPERTY_CLASS    => ilRadioOption::class
                     ]
                 ],
                 "setInfo" => self::txt("info_patching_mode")

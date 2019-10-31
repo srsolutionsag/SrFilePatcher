@@ -3,5 +3,6 @@ config_configuration_saved#:#Konfiguration gespeichert
 config_save#:#Speichern
 config_patching_mode#:#Reparatur-Modus
 config_patching_mode_single_file#:#Einzelne Datei
+config_ref_id_file#:#Ref-Id der Datei
 config_patching_mode_all_files#:#Alle Dateien
 config_info_patching_mode#:#Warnung: Das Plugin sollte stets gründlich mit einer einzelnen Datei getestet werden, bevor es auf alle Dateien angewandt wird!
