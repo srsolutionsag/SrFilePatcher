@@ -4,8 +4,11 @@
 
 namespace srag\Plugins\SrFilePatcher\Job;
 
+use srag\Plugins\SrFilePatcher\Config\Config;
 use srag\Plugins\SrFilePatcher\Utils\SrFilePatcherTrait;
 use ilSrFilePatcherPlugin;
+use ilSrFilePatcher;
+use ilUtil;
 use ilCronJob;
 use ilCronJobResult;
 use srag\DIC\SrFilePatcher\DICTrait;
@@ -120,10 +123,19 @@ class Job extends ilCronJob
     {
         $result = new ilCronJobResult();
 
-        // TODO: Implement run
+        $patching_mode = Config::getField(Config::KEY_PATCHING_MODE);
+        $file_patcher = new ilSrFilePatcher();
+
+        if($patching_mode === Config::KEY_MODE_SINGLE_FILE) {
+            $file_ref_id = Config::getField(Config::KEY_REF_ID_FILE);
+            $file_patcher->patchSingleFile($file_ref_id);
+        } elseif ($patching_mode === Config::KEY_MODE_ALL_FILES) {
+            $file_patcher->patchAllFiles();
+        } else {
+            ilUtil::sendFailure(self::dic()->language()->txt("error_no_patching_mode"), true);
+        }
 
         $result->setStatus(ilCronJobResult::STATUS_OK);
-
         return $result;
     }
 }

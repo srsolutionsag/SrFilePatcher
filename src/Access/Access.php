@@ -5,8 +5,10 @@
 namespace srag\Plugins\SrFilePatcher\Access;
 
 use srag\Plugins\SrFilePatcher\Utils\SrFilePatcherTrait;
-use ilSrFilePatcherPlugin;
 use srag\DIC\SrFilePatcher\DICTrait;
+use ilSrFilePatcherPlugin;
+use ilObjectPluginAccess;
+use ilUtil;
 
 /**
  * Class Access
@@ -18,7 +20,7 @@ use srag\DIC\SrFilePatcher\DICTrait;
  * @author  studer + raimann ag - Team Custom 1 <support-custom1@studer-raimann.ch>
  * @author  studer + raimann ag - Team Core 1 <support-core1@studer-raimann.ch>
  */
-final class Access
+class Access extends ilObjectPluginAccess
 {
 
     use DICTrait;
@@ -46,8 +48,35 @@ final class Access
     /**
      * Access constructor
      */
-    private function __construct()
+    public function __construct()
     {
+        parent::__construct();
+    }
+
+
+    /**
+     * @param int $ref_id
+     *
+     * @return bool
+     */
+    public static function hasWriteAccess(): bool {
+        $ref_id = filter_input(INPUT_GET, "ref_id");
+        $uid = self::dic()->user()->getId();
+
+        return self::dic()->access()->checkAccessOfUser($uid, "write", "", $ref_id);
+    }
+
+
+    public static function redirectNonAccess($class, string $cmd = "") {
+        ilUtil::sendFailure(self::plugin()->translate("permission_denied"), true);
+
+        if (is_object($class)) {
+            self::dic()->ctrl()->clearParameters($class);
+            self::dic()->ctrl()->redirect($class, $cmd);
+        } else {
+            self::dic()->ctrl()->clearParametersByClass($class);
+            self::dic()->ctrl()->redirectByClass($class, $cmd);
+        }
 
     }
 }
