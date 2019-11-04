@@ -7,7 +7,10 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'SrFilePatcherRemoveDataConfirm' => $baseDir . '/classes/uninstall/class.SrFilePatcherRemoveDataConfirm.php',
+    'ilSrFilePatcher' => $baseDir . '/classes/class.ilSrFilePatcher.php',
     'ilSrFilePatcherConfigGUI' => $baseDir . '/classes/class.ilSrFilePatcherConfigGUI.php',
+    'ilSrFilePatcherFormGUI' => $baseDir . '/classes/class.ilSrFilePatcherFormGUI.php',
+    'ilSrFilePatcherGUI' => $baseDir . '/classes/class.ilSrFilePatcherGUI.php',
     'ilSrFilePatcherPlugin' => $baseDir . '/classes/class.ilSrFilePatcherPlugin.php',
     'srag\\ActiveRecordConfig\\SrFilePatcher\\ActiveRecordConfig' => $vendorDir . '/srag/activerecordconfig/src/ActiveRecordConfig.php',
     'srag\\ActiveRecordConfig\\SrFilePatcher\\ActiveRecordConfigFormGUI' => $vendorDir . '/srag/activerecordconfig/src/ActiveRecordConfigFormGUI.php',

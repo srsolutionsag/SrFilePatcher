@@ -9,17 +9,17 @@ class ComposerStaticInite5780867b336af193f61687fd6d86e7d
     public static $prefixLengthsPsr4 = array (
         's' => 
         array (
-            'srag\\RemovePluginDataConfirm\\' => 29,
+            'srag\\RemovePluginDataConfirm\\SrFilePatcher\\' => 43,
             'srag\\Plugins\\SrFilePatcher\\' => 27,
             'srag\\LibrariesNamespaceChanger\\' => 31,
-            'srag\\DIC\\' => 9,
-            'srag\\CustomInputGUIs\\' => 21,
-            'srag\\ActiveRecordConfig\\' => 24,
+            'srag\\DIC\\SrFilePatcher\\' => 23,
+            'srag\\CustomInputGUIs\\SrFilePatcher\\' => 35,
+            'srag\\ActiveRecordConfig\\SrFilePatcher\\' => 38,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'srag\\RemovePluginDataConfirm\\' => 
+        'srag\\RemovePluginDataConfirm\\SrFilePatcher\\' => 
         array (
             0 => __DIR__ . '/..' . '/srag/removeplugindataconfirm/src',
         ),
@@ -31,15 +31,15 @@ class ComposerStaticInite5780867b336af193f61687fd6d86e7d
         array (
             0 => __DIR__ . '/..' . '/srag/librariesnamespacechanger/src',
         ),
-        'srag\\DIC\\' => 
+        'srag\\DIC\\SrFilePatcher\\' => 
         array (
             0 => __DIR__ . '/..' . '/srag/dic/src',
         ),
-        'srag\\CustomInputGUIs\\' => 
+        'srag\\CustomInputGUIs\\SrFilePatcher\\' => 
         array (
             0 => __DIR__ . '/..' . '/srag/custominputguis/src',
         ),
-        'srag\\ActiveRecordConfig\\' => 
+        'srag\\ActiveRecordConfig\\SrFilePatcher\\' => 
         array (
             0 => __DIR__ . '/..' . '/srag/activerecordconfig/src',
         ),
@@ -47,7 +47,10 @@ class ComposerStaticInite5780867b336af193f61687fd6d86e7d
 
     public static $classMap = array (
         'SrFilePatcherRemoveDataConfirm' => __DIR__ . '/../..' . '/classes/uninstall/class.SrFilePatcherRemoveDataConfirm.php',
+        'ilSrFilePatcher' => __DIR__ . '/../..' . '/classes/class.ilSrFilePatcher.php',
         'ilSrFilePatcherConfigGUI' => __DIR__ . '/../..' . '/classes/class.ilSrFilePatcherConfigGUI.php',
+        'ilSrFilePatcherFormGUI' => __DIR__ . '/../..' . '/classes/class.ilSrFilePatcherFormGUI.php',
+        'ilSrFilePatcherGUI' => __DIR__ . '/../..' . '/classes/class.ilSrFilePatcherGUI.php',
         'ilSrFilePatcherPlugin' => __DIR__ . '/../..' . '/classes/class.ilSrFilePatcherPlugin.php',
         'srag\\ActiveRecordConfig\\SrFilePatcher\\ActiveRecordConfig' => __DIR__ . '/..' . '/srag/activerecordconfig/src/ActiveRecordConfig.php',
         'srag\\ActiveRecordConfig\\SrFilePatcher\\ActiveRecordConfigFormGUI' => __DIR__ . '/..' . '/srag/activerecordconfig/src/ActiveRecordConfigFormGUI.php',

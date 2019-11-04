@@ -5,11 +5,14 @@
 namespace srag\Plugins\SrFilePatcher\Config;
 
 use srag\Plugins\SrFilePatcher\Utils\SrFilePatcherTrait;
+use ilUIPluginRouterGUI;
 use ilSrFilePatcherPlugin;
+use ilSrFilePatcherGUI;
 use ilNumberInputGUI;
 use ilRadioGroupInputGUI;
 use ilRadioOption;
 use srag\ActiveRecordConfig\SrFilePatcher\ActiveRecordConfigFormGUI;
+use srag\ActiveRecordConfig\SrFilePatcher\ActiveRecordConfigGUI;
 
 /**
  * Class ConfigFormGUI
@@ -27,6 +30,33 @@ class ConfigFormGUI extends ActiveRecordConfigFormGUI
     use SrFilePatcherTrait;
     const PLUGIN_CLASS_NAME = ilSrFilePatcherPlugin::class;
     const CONFIG_CLASS_NAME = Config::class;
+
+    /**
+     * @var ilSrFilePatcherPlugin
+     */
+    protected $pl;
+
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct(ActiveRecordConfigGUI $parent, $tab_id) {
+        $this->pl = ilSrFilePatcherPlugin::getInstance();
+        $this->tab_id = $tab_id;
+        parent::__construct($parent, $tab_id);
+
+        // add the test patcher tab for testing the plugin's effects on a single file before altering all files with the cron job
+        $this->ctrl->saveParameterByClass(ilSrFilePatcherGUI::class, "ref_id");
+        $link_target = self::dic()->ctrl()->getLinkTargetByClass(array(
+            ilUIPluginRouterGUI::class,
+            ilSrFilePatcherGUI::class
+        ));
+        self::dic()->tabs()->addTab(
+            "tab_single_file_tester",
+            $this->pl->txt("tab_single_file_tester"),
+            $link_target
+        );
+    }
 
 
     /**
