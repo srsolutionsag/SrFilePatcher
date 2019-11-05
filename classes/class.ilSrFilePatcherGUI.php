@@ -112,12 +112,31 @@ class ilSrFilePatcherGUI
     }
 
 
-    /**
-     * Validate form and cache account data in db (ldap account is later created after email confirmation)
-     */
     protected function patch()
     {
+        $this->showErrorReport($_POST['ref_id_file']);
+        $this->ctrl->redirectByClass(ilSrFilePatcherGUI::class, self::CMD_DEFAULT);
+    }
 
+
+    private function showErrorReport($a_file_ref_id)
+    {
+        $file_patcher = new ilSrFilePatcher();
+        $file = new ilObjFile($a_file_ref_id);
+        $error_report = $file_patcher->getErrorReportOfFileVersioning($file);
+        $block = "<div style='display:inline-block;clear:both;width:300px;margin:0'>";
+        $tab = "</div><div style='display:inline;'>";
+        $end = "</div><br>";
+        $html_error_report = "<b>ERROR REPORT FOR FILE " . $a_file_ref_id . ":</b><br>"
+            . $block . "num_duplicate_version_numbers:"    . $tab . $error_report['num_duplicate_version_numbers'] . $end
+            . $block . "has_wrong_max_version:"            . $tab . ($error_report['has_wrong_max_version']==true?"Yes":"No") . $end
+            . $block . "has_wrong_version:"                . $tab . ($error_report['has_wrong_version']==true?"Yes":"No") . $end
+            . $block . "num_missing_version_folders:"      . $tab . $error_report['num_missing_version_folders'] . $end
+            . $block . "num_redundant_version_folders:"    . $tab . $error_report['num_redundant_version_folders'] . $end
+            . $block . "num_lost_old_version_files:"       . $tab . $error_report['num_lost_old_version_files'] . $end
+            . $block . "num_lost_new_version_files:"       . $tab . $error_report['num_lost_new_version_files'] . $end
+            . $block . "num_misplaced_new_version_files:"  . $tab . $error_report['num_misplaced_new_version_files'] . $end;
+        ilUtil::sendInfo($html_error_report, true);
     }
 
 

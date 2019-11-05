@@ -64,17 +64,18 @@ class ilSrFilePatcher
     }
 
 
-    private function getErrorReportOfFileVersioning(ilObjFile $a_file)
+    public function getErrorReportOfFileVersioning(ilObjFile $a_file)
     {
+        $versions = $this->getVersions($a_file);
         return $error_report = [
-            'has_duplicate_version_numbers'   => $this->hasDuplicateVersionNumbers($a_file),
+            'num_duplicate_version_numbers'   => count($this->getDuplicateVersions($versions)['duplicated_old_versions']),
             'has_wrong_max_version'           => $this->hasWrongMaxVersion($a_file),
-            'has_wrong_current_version'       => $this->hasWrongCurrentVersion($a_file),
-            'has_missing_version_folders'     => $this->hasMissingVersionFolders($a_file),
-            'has_redundant_version_folders'   => $this->hasRedundantVersionFolders($a_file),
-            'has_lost_old_version_files'      => $this->hasLostOldVersionFiles($a_file),
-            'has_lost_new_version_files'      => $this->hasLostNewVersionFiles($a_file),
-            'has_misplaced_new_version_files' => $this->hasMisplacedNewVersionFiles($a_file),
+            'has_wrong_version'               => $this->hasWrongCurrentVersion($a_file),
+            'num_missing_version_folders'     => count($this->getVersionNumbersMissingInFileSystem($a_file)),
+            'num_redundant_version_folders'   => count($this->getRedundantVersionNumbersInFileSystem($a_file)),
+            'num_lost_old_version_files'      => count($this->getOldVersionNumbersMissingInFileSystem($a_file)),
+            'num_lost_new_version_files'      => count($this->getLostNewVersions($a_file)),
+            'num_misplaced_new_version_files' => count($this->getMisplacedNewVersions($a_file)),
         ];
     }
 
@@ -124,7 +125,7 @@ class ilSrFilePatcher
 
     private function hasMissingVersionFolders(ilObjFile $a_file)
     {
-        $version_numbers_missing_in_filesystem = $this->getNewVersionNumbersMissingInFileSystem($a_file);
+        $version_numbers_missing_in_filesystem = $this->getVersionNumbersMissingInFileSystem($a_file);
 
         if (!empty($version_numbers_missing_in_filesystem)) {
             return true;
@@ -189,7 +190,15 @@ class ilSrFilePatcher
      */
     private function getVersions(ilObjFile $a_file)
     {
-        return $versions = (array) ilHistory::_getEntriesForObject($a_file->getId(), $a_file->getType());
+        $versions = (array) ilHistory::_getEntriesForObject($a_file->getId(), $a_file->getType());
+
+        // extract information from info_params (contains version and max_version)
+        foreach ($versions as $index => $version) {
+            $params = $this->parseInfoParams($version);
+            $versions[$index] = array_merge($version, $params);
+        }
+
+        return $versions;
     }
 
 
@@ -262,21 +271,17 @@ class ilSrFilePatcher
             foreach ($new_versions as $new_version) {
                 if ($old_version['version'] === $new_version['version']) {
                     if (!in_array($old_version, $duplicated_old_versions)) {
-                        $duplicate_versions[] = $old_version;
+                        $duplicated_old_versions[] = $old_version;
                     }
                     if (!in_array($new_versions, $duplicated_new_versions)) {
-                        $duplicate_versions[] = $new_version;
+                        $duplicated_new_versions[] = $new_version;
                     }
                 }
             }
         }
 
-        if (!empty($duplicated_old_versions)) {
-            $duplicate_versions['duplicated_old_versions'] = $duplicated_old_versions;
-        }
-        if (!empty($duplicated_new_versions)) {
-            $duplicate_versions['duplicated_new_versions'] = $duplicated_new_versions;
-        }
+        $duplicate_versions['duplicated_old_versions'] = $duplicated_old_versions;
+        $duplicate_versions['duplicated_new_versions'] = $duplicated_new_versions;
 
         return $duplicate_versions;
     }
@@ -355,9 +360,14 @@ class ilSrFilePatcher
     private function getVersionNumbersInFilesystem(ilObjFile $a_file)
     {
         $file_directory = $a_file->getDirectory();
-        $sub_directories = glob($file_directory, GLOB_ONLYDIR);
-        // the names of the sub-directories correspond to the version numbers
-        return $sub_directories;
+        $sub_directories = glob($file_directory . "/*", GLOB_ONLYDIR);
+
+        $version_numbers = [];
+        foreach ($sub_directories as $sub_directory) {
+            $version_numbers[] = (string)(int) str_replace($file_directory . "/", "", $sub_directory);
+        }
+
+        return $version_numbers;
     }
 
 
@@ -374,7 +384,7 @@ class ilSrFilePatcher
 
         $old_versions_missing_in_filesystem = [];
         foreach ($old_version_numbers as $old_version_number) {
-            if (!in_array($old_version_numbers, $version_numbers_in_filesystem)) {
+            if (!in_array($old_version_number, $version_numbers_in_filesystem)) {
                 $old_versions_missing_in_filesystem[] = $old_version_number;
             }
         }
@@ -383,20 +393,19 @@ class ilSrFilePatcher
     }
 
 
-    private function getNewVersionNumbersMissingInFileSystem(ilObjFile $a_file)
+    private function getVersionNumbersMissingInFileSystem(ilObjFile $a_file)
     {
-        $new_versions = $this->getNewVersions($this->getVersions($a_file));
-        $new_version_numbers = $this->getVersionNumbers($new_versions);
+        $correct_version_numbers = $this->getCorrectVersionNumbers($this->getVersions($a_file));
         $version_numbers_in_filesystem = $this->getVersionNumbersInFilesystem($a_file);
 
-        $new_versions_missing_in_filesystem = [];
-        foreach ($new_version_numbers as $new_version_number) {
-            if (!in_array($new_version_numbers, $version_numbers_in_filesystem)) {
-                $new_versions_missing_in_filesystem[] = $new_version_number;
+        $versions_missing_in_filesystem = [];
+        foreach ($correct_version_numbers as $correct_version_number) {
+            if (!in_array($correct_version_number, $version_numbers_in_filesystem)) {
+                $versions_missing_in_filesystem[] = $correct_version_number;
             }
         }
 
-        return $new_versions_missing_in_filesystem;
+        return $versions_missing_in_filesystem;
     }
 
 
@@ -446,20 +455,65 @@ class ilSrFilePatcher
 
     private function getMisplacedNewVersions(ilObjFile $a_file)
     {
-        $misplaced_new_versions = []; // new versions that are located inside a folder that doesn't match their version number
+        $misplaced_new_versions = []; // new versions that are inside a folder that doesn't match their (correct) version number
 
-        $duplicated_versions = $this->getDuplicateVersions($this->getVersions($a_file));
-        $duplicated_new_versions = $duplicated_versions['duplicated_new_versions'];
+        $new_versions = $this->getNewVersions($this->getVersions($a_file));
         $lost_new_versions = $this->getLostNewVersions($a_file);
 
-        // new version-files that have not been lost due to bearing the same name as their duplicate
-        // have instead been inadvertently misplaced in the duplicates version folder
-        foreach ($duplicated_new_versions as $duplicated_new_version) {
-            if (!in_array($duplicated_new_version, $lost_new_versions)) {
-                $misplaced_new_versions[] = $duplicated_new_version;
+        // new versions that have not been lost due to bearing the same name as an old version have inadvertently been misplaced
+        foreach ($new_versions as $new_version) {
+            if (!in_array($new_version, $lost_new_versions)) {
+                $misplaced_new_versions[] = $new_version;
             }
         }
 
         return $misplaced_new_versions;
+    }
+
+
+    /**
+     * Function copied from ilObjFile
+     *
+     * @param $entry
+     *
+     * @return array
+     */
+    private function parseInfoParams($entry)
+    {
+        $data = explode(",", $entry["info_params"]);
+
+        // bugfix: first created file had no version number
+        // this is a workaround for all files created before the bug was fixed
+        if (empty($data[1])) {
+            $data[1] = "1";
+        }
+
+        if (empty($data[2])) {
+            $data[2] = "1";
+        }
+
+        $result = array(
+            "filename"         => $data[0],
+            "version"          => $data[1],
+            "max_version"      => $data[2],
+            "rollback_version" => "",
+            "rollback_user_id" => "",
+        );
+
+        // if rollback, the version contains the rollback version as well
+        // bugfix mantis 26236: rollback info is read from version to ensure compatibility with older ilias versions
+        if ($entry["action"] == "rollback") {
+            $tokens = explode("|", $result["version"]);
+            if (count($tokens) > 1) {
+                $result["version"] = $tokens[0];
+                $result["rollback_version"] = $tokens[1];
+
+                if (count($tokens) > 2) {
+                    $result["rollback_user_id"] = $tokens[2];
+                }
+            }
+        }
+
+        return $result;
     }
 }
