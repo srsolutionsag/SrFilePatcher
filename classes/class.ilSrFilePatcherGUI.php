@@ -24,8 +24,9 @@ class ilSrFilePatcherGUI
 
     const PLUGIN_CLASS_NAME = ilSrFilePatcherPlugin::class;
     const CMD_DEFAULT = "index";
-    const CMD_PATCH = "patch";
+    const CMD_SHOW_ERROR_REPORT = "showErrorReport";
     const CMD_CANCEL = "cancel";
+    const CMD_PATCH = "patch";
 
 
     /**
@@ -81,8 +82,9 @@ class ilSrFilePatcherGUI
                 $cmd = $this->ctrl->getCmd(self::CMD_DEFAULT);
                 switch ($cmd) {
                     case self::CMD_DEFAULT:
-                    case self::CMD_PATCH:
+                    case self::CMD_SHOW_ERROR_REPORT:
                     case self::CMD_CANCEL:
+                    case self::CMD_PATCH:
                         $this->$cmd();
                         break;
                     default:
@@ -112,39 +114,23 @@ class ilSrFilePatcherGUI
     }
 
 
-    protected function patch()
+    private function showErrorReport()
     {
-        $this->showErrorReport($_POST['ref_id_file']);
-        $this->ctrl->redirectByClass(ilSrFilePatcherGUI::class, self::CMD_DEFAULT);
+        // back-tab
+        $this->tabs->clearTargets();
+        $this->ctrl->saveParameterByClass(ilSrFilePatcherGUI::class, "ref_id");
+        $link_target = $this->ctrl->getLinkTargetByClass(ilSrFilePatcherGUI::class);
+
+        $this->tabs->setBackTarget($this->lng->txt("back"), $link_target);
+        $report_table = new ilFileErrorReportTableGUI($this, self::CMD_DEFAULT, $_POST['ref_id_file']);
+        $this->tpl->setContent($report_table->getHTML());
     }
-
-
-    private function showErrorReport($a_file_ref_id)
-    {
-        $file_patcher = new ilSrFilePatcher();
-        $file = new ilObjFile($a_file_ref_id);
-        $error_report = $file_patcher->getErrorReportOfFileVersioning($file);
-        $block = "<div style='display:inline-block;clear:both;width:300px;margin:0'>";
-        $tab = "</div><div style='display:inline;'>";
-        $end = "</div><br>";
-        $html_error_report = "<b>ERROR REPORT FOR FILE " . $a_file_ref_id . ":</b><br>"
-            . $block . "num_duplicate_version_numbers:"    . $tab . $error_report['num_duplicate_version_numbers'] . $end
-            . $block . "has_wrong_max_version:"            . $tab . ($error_report['has_wrong_max_version']==true?"Yes":"No") . $end
-            . $block . "has_wrong_version:"                . $tab . ($error_report['has_wrong_version']==true?"Yes":"No") . $end
-            . $block . "num_missing_version_folders:"      . $tab . $error_report['num_missing_version_folders'] . $end
-            . $block . "num_redundant_version_folders:"    . $tab . $error_report['num_redundant_version_folders'] . $end
-            . $block . "num_lost_old_version_files:"       . $tab . $error_report['num_lost_old_version_files'] . $end
-            . $block . "num_lost_new_version_files:"       . $tab . $error_report['num_lost_new_version_files'] . $end
-            . $block . "num_misplaced_new_version_files:"  . $tab . $error_report['num_misplaced_new_version_files'] . $end;
-        ilUtil::sendInfo($html_error_report, true);
-    }
-
 
 
     /**
      * Return to plugin overview
      */
-    protected function cancel()
+    private function cancel()
     {
         $this->ctrl->saveParameterByClass(ilAdministrationGUI::class, "ref_id");
         $this->ctrl->redirectByClass(
@@ -156,4 +142,7 @@ class ilSrFilePatcherGUI
     }
 
 
+    private function patch() {
+
+    }
 }

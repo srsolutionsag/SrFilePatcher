@@ -47,6 +47,8 @@ class ComposerStaticInite5780867b336af193f61687fd6d86e7d
 
     public static $classMap = array (
         'SrFilePatcherRemoveDataConfirm' => __DIR__ . '/../..' . '/classes/uninstall/class.SrFilePatcherRemoveDataConfirm.php',
+        'ilFileErrorReportGenerator' => __DIR__ . '/../..' . '/classes/ErrorReport/class.ilFileErrorReportGenerator.php',
+        'ilFileErrorReportTableGUI' => __DIR__ . '/../..' . '/classes/ErrorReport/class.ilFileErrorReportTableGUI.php',
         'ilSrFilePatcher' => __DIR__ . '/../..' . '/classes/class.ilSrFilePatcher.php',
         'ilSrFilePatcherConfigGUI' => __DIR__ . '/../..' . '/classes/class.ilSrFilePatcherConfigGUI.php',
         'ilSrFilePatcherFormGUI' => __DIR__ . '/../..' . '/classes/class.ilSrFilePatcherFormGUI.php',

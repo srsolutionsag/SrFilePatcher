@@ -12,6 +12,14 @@ error_no_file_for_ref_id#:# Error: No file found for ref_id %s. Please specify a
 
 form_title_single_file_patcher#:#Patch Single File
 form_input_ref_id_file#:#Ref-Id of File
-form_cmd_button_patch#:#Patch
+form_cmd_button_show_report#:#Show Error Report
 
 tab_single_file_tester#:#Single File Tester
+
+table_title_error_report#:#Error Report for File with Ref-Id %s
+table_column_numbered_correctly#:#Numbered Correctly
+table_column_stored_correctly#:#Stored Correctly
+table_column_folder_exists#:#Folder Exists
+table_column_file_exists#:#File Exists
+table_column_patch_possible#:#Patch Possible
+table_cmd_button_patch#:#Patch

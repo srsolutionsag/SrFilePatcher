@@ -10,8 +10,16 @@ config_info_patching_mode#:#Warnung: Das Plugin sollte stets gründlich mit eine
 error_no_patching_mode#:#Fehler: Kein Reparatur-Modus angegeben. Modi können in der Plugin Konfiguration ausgewählt werden.
 error_no_file_for_ref_id#:# Fehler: Keine Datei mit der ref_id %s gefunden. Bitte geben Sie in der Plugin Konfiguration eine gültige Ref-Id an.
 
-form_title_single_file_patcher#:#Repariere einzelne Datei
+form_title_single_file_patcher#:#Patche einzelne Datei
 form_input_ref_id_file#:#Ref-Id der Datei
-form_cmd_button_patch#:#Reparieren
+form_cmd_button_show_report#:#Fehlerbericht anzeigen
 
 tab_single_file_tester#:#Einzeldatei-Tester
+
+table_title_error_report#:#Fehlerbericht für die Datei mit der Ref-Id %s
+table_column_numbered_correctly#:#Korrekt nummeriert
+table_column_stored_correctly#:#Korrekt abgelegt
+table_column_folder_exists#:#Ordner vorhanden
+table_column_file_exists#:#Datei vorhanden
+table_column_patch_possible#:#Patch möglich
+table_cmd_button_patch#:#Patchen

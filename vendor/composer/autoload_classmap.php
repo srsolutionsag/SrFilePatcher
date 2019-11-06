@@ -7,6 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'SrFilePatcherRemoveDataConfirm' => $baseDir . '/classes/uninstall/class.SrFilePatcherRemoveDataConfirm.php',
+    'ilFileErrorReportGenerator' => $baseDir . '/classes/ErrorReport/class.ilFileErrorReportGenerator.php',
+    'ilFileErrorReportTableGUI' => $baseDir . '/classes/ErrorReport/class.ilFileErrorReportTableGUI.php',
     'ilSrFilePatcher' => $baseDir . '/classes/class.ilSrFilePatcher.php',
     'ilSrFilePatcherConfigGUI' => $baseDir . '/classes/class.ilSrFilePatcherConfigGUI.php',
     'ilSrFilePatcherFormGUI' => $baseDir . '/classes/class.ilSrFilePatcherFormGUI.php',
