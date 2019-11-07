@@ -49,10 +49,11 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
 
 
     /**
-     * ilFileVersionsTableGUI constructor.
+     * ilFileErrorReportTableGUI constructor.
      *
-     * @param ilFileVersionsGUI $calling_gui_class
-     * @param string            $a_parent_cmd
+     * @param ilSrFilePatcherGUI $calling_gui_class
+     * @param string             $a_parent_cmd
+     * @param string             $a_file_ref_id
      */
     public function __construct(
         ilSrFilePatcherGUI $calling_gui_class,
@@ -81,9 +82,12 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         $this->setFormAction($this->ctrl->getFormAction($calling_gui_class));
 
         // Columns
-        $this->addColumn($this->lng->txt("version"), "", "1");
+        $this->addColumn($this->pl->txt("table_column_current_version"), "", "1");
+        $this->addColumn($this->pl->txt("table_column_correct_version"), "", "1");
         $this->addColumn($this->lng->txt("date"));
         $this->addColumn($this->lng->txt("filename"));
+        $this->addColumn($this->pl->txt("table_column_current_path"));
+        $this->addColumn($this->pl->txt("table_column_correct_path"));
         $this->addColumn($this->pl->txt("table_column_numbered_correctly"));
         $this->addColumn($this->pl->txt("table_column_stored_correctly"));
         $this->addColumn($this->pl->txt("table_column_folder_exists"));
@@ -115,10 +119,14 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         $no = "<div style='color:darkred;'>" . $this->lng->txt('no') . "</div>";
 
         // split params and prepare for output where needed
+        $file_ref_id = $a_set["file_ref_id"];
         $hist_entry_id = $a_set["hist_entry_id"];
-        $version = (int) $a_set["version"];
+        $current_version = (int) $a_set["version"];
+        $correct_version = (int) $a_set["correct_version"];
         $date = ilDatePresentation::formatDate(new ilDateTime($a_set['date'], IL_CAL_DATETIME));
         $filename = $a_set["filename"];
+        $current_path = $a_set["current_path"];
+        $correct_path = $a_set["correct_path"];
         $numbered_correctly = ($a_set['numbered_correctly'] == true ? $yes : $no);
         $stored_correctly = ($a_set['stored_correctly'] == true ? $yes : $no);
         $folder_exists = ($a_set['folder_exists'] == true ? $yes : $no);
@@ -126,16 +134,26 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         $patch_possible = ($a_set['patch_possible'] == true ? $yes : $no);
 
         // get download link for file version
-        $this->ctrl->setParameter($this->parent_obj, 'hist_id', $hist_entry_id);
-        $dl_link = $this->ctrl->getLinkTarget($this->parent_obj, ilFileVersionsGUI::CMD_DOWNLOAD_VERSION);
+        $this->ctrl->setParameter($this->parent_obj, ilSrFilePatcherGUI::FILE_REF_ID, $file_ref_id);
+        $this->ctrl->setParameter($this->parent_obj, ilSrFilePatcherGUI::HIST_ID, $hist_entry_id);
+        $link = $this->ctrl->getLinkTarget($this->parent_obj, ilSrFilePatcherGUI::CMD_DOWNLOAD_VERSION);
         // reset history parameter
-        $this->ctrl->setParameter($this->parent_obj, 'hist_id', "");
+        $this->ctrl->setParameter($this->parent_obj, ilSrFilePatcherGUI::HIST_ID, "");
 
         // fill template
-        $this->tpl->setVariable("TXT_VERSION", $version);
+        $this->tpl->setVariable("TXT_CURRENT_VERSION", $current_version);
+        $this->tpl->setVariable("TXT_CORRECT_VERSION", $correct_version);
         $this->tpl->setVariable("TXT_DATE", $date);
-        $this->tpl->setVariable("DL_LINK", $dl_link);
+        // only create a link if the file exists
+        if ($a_set['file_exists']) {
+            $link_opening_tag = "<a href=\"$link\">";
+            $link_closing_tag = "</a>";
+            $this->tpl->setVariable("LINK_OPENING_TAG", $link_opening_tag);
+            $this->tpl->setVariable("LINK_CLOSING_TAG", $link_closing_tag);
+        }
         $this->tpl->setVariable("TXT_FILENAME", $filename);
+        $this->tpl->setVariable("TXT_CURRENT_PATH", $current_path);
+        $this->tpl->setVariable("TXT_CORRECT_PATH", $correct_path);
         $this->tpl->setVariable("TXT_NUMBERED_CORRECTLY", $numbered_correctly);
         $this->tpl->setVariable("TXT_STORED_CORRECTLY", $stored_correctly);
         $this->tpl->setVariable("TXT_FOLDER_EXISTS", $folder_exists);

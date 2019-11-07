@@ -15,20 +15,21 @@ use srag\Plugins\SrFilePatcher\Config\ConfigFormGUI;
  * @ilCtrl_IsCalledBy   ilSrFilePatcherGUI: ilUIPluginRouterGUI
  * @ilCtrl_Calls        ilSrFilePatcherGUI: ilObjComponentSettingsGUI
  *
- * @author  studer + raimann ag - Team Core 1 <support-core1@studer-raimann.ch>
+ * @author              studer + raimann ag - Team Core 1 <support-core1@studer-raimann.ch>
  */
 class ilSrFilePatcherGUI
 {
+
     use DICTrait;
     use SrFilePatcherTrait;
-
     const PLUGIN_CLASS_NAME = ilSrFilePatcherPlugin::class;
+    const HIST_ID = 'hist_id';
+    const FILE_REF_ID = 'file_ref_id';
     const CMD_DEFAULT = "index";
     const CMD_SHOW_ERROR_REPORT = "showErrorReport";
     const CMD_CANCEL = "cancel";
     const CMD_PATCH = "patch";
-
-
+    const CMD_DOWNLOAD_VERSION = "downloadVersion";
     /**
      * @var ilCtrl
      */
@@ -55,19 +56,33 @@ class ilSrFilePatcherGUI
     private $tpl;
 
 
-
-
-    public function __construct() {
+    public function __construct()
+    {
         $this->ctrl = self::dic()->ctrl();
-        $this->lng  = self::dic()->language();
-        $this->log  = self::dic()->log();
-        $this->pl   = ilSrFilePatcherPlugin::getInstance();
+        $this->lng = self::dic()->language();
+        $this->log = self::dic()->log();
+        $this->pl = ilSrFilePatcherPlugin::getInstance();
         $this->tabs = self::dic()->tabs();
-        $this->tpl  = self::dic()->ui()->mainTemplate();
+        $this->tpl = self::dic()->ui()->mainTemplate();
     }
 
 
-    public function executeCommand() {
+    public function executeCommand()
+    {
+        // this class is reachable even when the plugin is not activated as its tab is created inside the (always accessible)
+        // plugin configuration. The following if-statement ensures that the functionality of this class is not usable when
+        // the plugin is deactivated
+        if (!$this->pl->isActive()) {
+            ilUtil::sendFailure($this->pl->txt('error_plugin_not_activated'), true);
+            $this->ctrl->saveParameterByClass(ilAdministrationGUI::class, "ref_id");
+            $this->ctrl->redirectByClass(
+                array(
+                    ilAdministrationGUI::class,
+                    ilObjComponentSettingsGUI::class,
+                ),
+                "listPlugins"
+            );
+        }
 
         $this->ctrl->saveParameterByClass(ilSrFilePatcherGUI::class, "ref_id");
         $next_class = self::dic()->ctrl()->getNextClass($this);
@@ -85,6 +100,7 @@ class ilSrFilePatcherGUI
                     case self::CMD_SHOW_ERROR_REPORT:
                     case self::CMD_CANCEL:
                     case self::CMD_PATCH:
+                    case self::CMD_DOWNLOAD_VERSION:
                         $this->$cmd();
                         break;
                     default:
@@ -98,19 +114,20 @@ class ilSrFilePatcherGUI
     }
 
 
-    private function index($a_init_form = true, $a_fill_form = true) {
+    private function index()
+    {
         // back-tab
         $this->tabs->clearTargets();
         $this->ctrl->saveParameterByClass(ilAdministrationGUI::class, "ref_id");
         $link_target = $this->ctrl->getLinkTargetByClass(array(
-            ilAdministrationGUI::class,
-            ilObjComponentSettingsGUI::class)
+                ilAdministrationGUI::class,
+                ilObjComponentSettingsGUI::class,
+            )
         );
         $this->tabs->setBackTarget($this->lng->txt("back"), $link_target);
 
         $form = new ilSrFilePatcherFormGUI($this);
         $this->tpl->setContent($form->getHTML());
-
     }
 
 
@@ -136,13 +153,23 @@ class ilSrFilePatcherGUI
         $this->ctrl->redirectByClass(
             array(
                 ilAdministrationGUI::class,
-                ilObjComponentSettingsGUI::class),
+                ilObjComponentSettingsGUI::class,
+            ),
             "listPlugins"
         );
     }
 
 
-    private function patch() {
+    private function patch()
+    {
 
+    }
+
+
+    private function downloadVersion()
+    {
+        $file = new ilObjFile($_GET[self::FILE_REF_ID]);
+        $version = (int) $_GET[self::HIST_ID];
+        $file->sendFile($version);
     }
 }

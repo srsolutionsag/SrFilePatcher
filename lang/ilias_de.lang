@@ -7,6 +7,7 @@ config_ref_id_file#:#Ref-Id der Datei
 config_patching_mode_all_files#:#Alle Dateien
 config_info_patching_mode#:#Warnung: Das Plugin sollte stets gründlich mit einer einzelnen Datei getestet werden, bevor es auf alle Dateien angewandt wird!
 
+error_plugin_not_activated#:#Fehler: Plugin nicht aktiviert.
 error_no_patching_mode#:#Fehler: Kein Reparatur-Modus angegeben. Modi können in der Plugin Konfiguration ausgewählt werden.
 error_no_file_for_ref_id#:# Fehler: Keine Datei mit der ref_id %s gefunden. Bitte geben Sie in der Plugin Konfiguration eine gültige Ref-Id an.
 
@@ -17,9 +18,15 @@ form_cmd_button_show_report#:#Fehlerbericht anzeigen
 tab_single_file_tester#:#Einzeldatei-Tester
 
 table_title_error_report#:#Fehlerbericht für die Datei mit der Ref-Id %s
+
+table_column_current_version#:#Derzeitige Version
+table_column_correct_version#:#Korrekte Version
+table_column_current_path#:#Derzeitiger Pfad
+table_column_correct_path#:#Korrekter Pfad
 table_column_numbered_correctly#:#Korrekt nummeriert
 table_column_stored_correctly#:#Korrekt abgelegt
 table_column_folder_exists#:#Ordner vorhanden
 table_column_file_exists#:#Datei vorhanden
 table_column_patch_possible#:#Patch möglich
+
 table_cmd_button_patch#:#Patchen
