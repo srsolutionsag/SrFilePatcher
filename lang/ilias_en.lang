@@ -17,7 +17,13 @@ form_cmd_button_show_report#:#Show Error Report
 
 tab_single_file_tester#:#Single File Tester
 
-table_title_error_report#:#Error Report for File with Ref-Id %s
+error_report_title#:#Error Report for File with Ref-Id %s
+error_report_title_version_report#:#Report Concerning the Individual Versions
+error_report_title_db_report#:#Report Concerning the Information Stored in the Database
+error_report_label_db_current_version#:#Current Database Entry for Version
+error_report_label_db_correct_version#:#Correct Database Entry for Version
+error_report_label_db_current_max_version#:#Current Database Entry for Max-Version
+error_report_label_db_correct_max_version#:#Correct Database Entry for Max-Version
 
 table_column_current_version#:#Current Version
 table_column_correct_version#:#Correct Version

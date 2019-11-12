@@ -27,9 +27,13 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
      */
     private $current_version;
     /**
-     * @var ilObjFile
+     * @var array
      */
-    private $file;
+    private $error_report;
+    /**
+     * int
+     */
+    private $file_ref_id;
     /**
      * @var ilCtrl
      */
@@ -53,18 +57,19 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
      *
      * @param ilSrFilePatcherGUI $calling_gui_class
      * @param string             $a_parent_cmd
-     * @param string             $a_file_ref_id
+     * @param array              $a_error_report
      */
     public function __construct(
         ilSrFilePatcherGUI $calling_gui_class,
         $a_parent_cmd = ilSrFilePatcherGUI::CMD_DEFAULT,
-        $a_file_ref_id
+        $a_error_report
     ) {
         $this->setId(self::class);
         parent::__construct($calling_gui_class, $a_parent_cmd, "");
-        $this->file = new ilObjFile($a_file_ref_id);
-        $this->current_version = (int) $this->file->getVersion();
-        $this->max_version = (int) $this->file->getMaxVersion();
+        $this->error_report = $a_error_report;
+        $this->file_ref_id = $this->error_report['file_ref_id'];
+        $this->current_version = (int) $this->error_report['db_current_version'];
+        $this->max_version = (int) $this->error_report['db_current_max_version'];
 
         // General
         $this->log = self::dic()->logger()->root();
@@ -73,9 +78,8 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         $this->pl = ilSrFilePatcherPlugin::getInstance();
 
         // Appearance
-        $this->setTitle(sprintf($this->pl->txt("table_title_error_report"), $a_file_ref_id));
         $template_dir = "Customizing/global/plugins/Services/Cron/CronHook/SrFilePatcher";
-        $this->setRowTemplate("tpl.file_error_report_row.html", $template_dir);
+        $this->setRowTemplate("tpl.version_report_table_row.html", $template_dir);
         $this->setLimit(9999);
 
         // Form
@@ -106,10 +110,8 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
 
     private function initData()
     {
-        $report_generator = new ilFileErrorReportGenerator();
-        $report = $report_generator->getReport($this->file);
-        $this->setData($report);
-        $this->setMaxCount(is_array($report) ? count($report) : 0);
+        $this->setData($this->error_report);
+        $this->setMaxCount(is_array($this->error_report) ? count($this->error_report) : 0);
     }
 
 
@@ -119,7 +121,6 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         $no = "<div style='color:darkred;'>" . $this->lng->txt('no') . "</div>";
 
         // split params and prepare for output where needed
-        $file_ref_id = $a_set["file_ref_id"];
         $hist_entry_id = $a_set["hist_entry_id"];
         $current_version = (int) $a_set["version"];
         $correct_version = (int) $a_set["correct_version"];
@@ -134,7 +135,7 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         $patch_possible = ($a_set['patch_possible'] == true ? $yes : $no);
 
         // get download link for file version
-        $this->ctrl->setParameter($this->parent_obj, ilSrFilePatcherGUI::FILE_REF_ID, $file_ref_id);
+        $this->ctrl->setParameter($this->parent_obj, ilSrFilePatcherGUI::FILE_REF_ID, $this->file_ref_id);
         $this->ctrl->setParameter($this->parent_obj, ilSrFilePatcherGUI::HIST_ID, $hist_entry_id);
         $link = $this->ctrl->getLinkTarget($this->parent_obj, ilSrFilePatcherGUI::CMD_DOWNLOAD_VERSION);
         // reset history parameter

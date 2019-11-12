@@ -17,7 +17,13 @@ form_cmd_button_show_report#:#Fehlerbericht anzeigen
 
 tab_single_file_tester#:#Einzeldatei-Tester
 
-table_title_error_report#:#Fehlerbericht für die Datei mit der Ref-Id %s
+error_report_title#:#Fehlerbericht für die Datei mit der Ref-Id %s
+error_report_title_version_report#:#Bericht bezüglich der einzelnen Versionen
+error_report_title_db_report#:#Bericht bezüglich der in der Datenbank gespeicherten Informationen
+error_report_label_db_current_version#:#Derzeitiger Datenbankeintrag für die Version
+error_report_label_db_correct_version#:#Korrekter Datenbankeintrag für die Version
+error_report_label_db_current_max_version#:#Derzeitiger Datenbankeintrag für die Max-Version
+error_report_label_db_correct_max_version#:#Korrekter Datenbankeintrag für die Max-Version
 
 table_column_current_version#:#Derzeitige Version
 table_column_correct_version#:#Korrekte Version

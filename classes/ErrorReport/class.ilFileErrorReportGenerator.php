@@ -65,10 +65,12 @@ class ilFileErrorReportGenerator
         $lost_versions = array_merge($lost_old_versions, $lost_new_versions);
 
         $report = [];
+        // store file ref_id in report to preserve the information regarding which file the report concerns
+        $report['file_ref_id'] = $a_file->getRefId();
+        // add data concerning the individual file versions to the report
         foreach ($versions as $version) {
             $hist_entry_id = $version['hist_entry_id'];
 
-            $report[$hist_entry_id]['file_ref_id'] = $a_file->getRefId();
             $report[$hist_entry_id]['hist_entry_id'] = $hist_entry_id;
             $report[$hist_entry_id]['version'] = $version['version'];
             $report[$hist_entry_id]['correct_version'] = $version['correct_version'];
@@ -105,6 +107,11 @@ class ilFileErrorReportGenerator
                 $report[$hist_entry_id]['correct_path'] = $version['correct_path'];
             }
         }
+        // add db-data to record
+        $report['db_current_version'] = $a_file->getVersion();
+        $report['db_correct_version'] = $this->getCorrectCurrentVersion($a_file);
+        $report['db_current_max_version'] = $a_file->getMaxVersion();
+        $report['db_correct_max_version'] = $this->getCorrectMaxVersion($a_file);
 
         return $report;
     }
