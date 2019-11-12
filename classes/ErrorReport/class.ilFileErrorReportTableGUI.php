@@ -35,6 +35,10 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
      */
     private $file_ref_id;
     /**
+     * string
+     */
+    private $file_dir;
+    /**
      * @var ilCtrl
      */
     protected $ctrl;
@@ -58,16 +62,19 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
      * @param ilSrFilePatcherGUI $calling_gui_class
      * @param string             $a_parent_cmd
      * @param array              $a_error_report
+     * @param string             $a_file_dir
      */
     public function __construct(
         ilSrFilePatcherGUI $calling_gui_class,
         $a_parent_cmd = ilSrFilePatcherGUI::CMD_DEFAULT,
-        $a_error_report
+        $a_error_report,
+        $a_file_dir
     ) {
         $this->setId(self::class);
         parent::__construct($calling_gui_class, $a_parent_cmd, "");
         $this->error_report = $a_error_report;
         $this->file_ref_id = $this->error_report['file_ref_id'];
+        $this->file_dir = $a_file_dir;
         $this->current_version = (int) $this->error_report['db_current_version'];
         $this->max_version = (int) $this->error_report['db_current_max_version'];
 
@@ -126,8 +133,8 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         $correct_version = (int) $a_set["correct_version"];
         $date = ilDatePresentation::formatDate(new ilDateTime($a_set['date'], IL_CAL_DATETIME));
         $filename = $a_set["filename"];
-        $current_path = $a_set["current_path"];
-        $correct_path = $a_set["correct_path"];
+        $current_path = ".../" . str_replace($this->file_dir, "", $a_set["current_path"]);
+        $correct_path = ".../" . str_replace($this->file_dir, "", $a_set["correct_path"]);
         $numbered_correctly = ($a_set['numbered_correctly'] == true ? $yes : $no);
         $stored_correctly = ($a_set['stored_correctly'] == true ? $yes : $no);
         $folder_exists = ($a_set['folder_exists'] == true ? $yes : $no);

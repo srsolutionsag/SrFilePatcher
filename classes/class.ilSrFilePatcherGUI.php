@@ -178,13 +178,25 @@ class ilSrFilePatcherGUI
         unset($error_report['db_correct_max_version']);
 
         // version report table
-        $version_report_table = new ilFileErrorReportTableGUI($this, self::CMD_DEFAULT, $error_report);
+        $fs_storage_file = new ilFSStorageFile();
+        $file_absolute_path = $fs_storage_file->getAbsolutePath();
+        $file_dir = substr($file_absolute_path, 0, (strpos($file_absolute_path, "ilFile/") + 7));
+        $version_report_table = new ilFileErrorReportTableGUI($this, self::CMD_DEFAULT, $error_report, $file_dir);
         $version_report_table_tpl = new ilTemplate("tpl.version_report_table.html", true, true, $template_dir);
         $version_report_table->setTemplate($version_report_table_tpl);
         $version_report_table_tpl->setVariable("DB_REPORT", $db_report_tpl->get());
         $version_report_table_tpl->setVariable(
             "VERSION_REPORT_TABLE_TITLE",
             $this->pl->txt("error_report_title_version_report")
+        );
+        $version_report_table_tpl->setVariable(
+            "VERSION_REPORT_TABLE_LABEL_FILE_DIR",
+            $this->pl->txt("error_report_label_file_dir") . ":"
+        );
+        $version_report_table_tpl->setVariable("VERSION_REPORT_TABLE_CONTENT_FILE_DIR", ($file_dir . "..."));
+        $version_report_table_tpl->setVariable(
+            "VERSION_REPORT_TABLE_INFO_FILE_DIR",
+            $this->pl->txt("error_report_info_file_dir")
         );
         $version_report_table_tpl->setContent($version_report_table->getHTML());
 

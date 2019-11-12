@@ -24,6 +24,8 @@ error_report_label_db_current_version#:#Derzeitiger Datenbankeintrag für die Ve
 error_report_label_db_correct_version#:#Korrekter Datenbankeintrag für die Version
 error_report_label_db_current_max_version#:#Derzeitiger Datenbankeintrag für die Max-Version
 error_report_label_db_correct_max_version#:#Korrekter Datenbankeintrag für die Max-Version
+error_report_label_file_dir#:#ILIAS Dateiverzeichnis
+error_report_info_file_dir#:#Verzeichnis in welchem Dateien gespeichert werden. Die Pfade in nachfolgender Tabelle beginnen hier.
 
 table_column_current_version#:#Derzeitige Version
 table_column_correct_version#:#Korrekte Version
