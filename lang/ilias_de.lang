@@ -9,7 +9,7 @@ config_info_patching_mode#:#Warnung: Das Plugin sollte stets gründlich mit eine
 
 error_plugin_not_activated#:#Fehler: Plugin nicht aktiviert.
 error_no_patching_mode#:#Fehler: Kein Reparatur-Modus angegeben. Modi können in der Plugin Konfiguration ausgewählt werden.
-error_no_file_for_ref_id#:# Fehler: Keine Datei mit der ref_id %s gefunden. Bitte geben Sie in der Plugin Konfiguration eine gültige Ref-Id an.
+error_no_file_for_ref_id#:# Keine Datei mit der ref_id %s gefunden. Bitte geben Sie eine gültige Ref-Id an.
 
 form_title_single_file_patcher#:#Patche einzelne Datei
 form_input_ref_id_file#:#Ref-Id der Datei

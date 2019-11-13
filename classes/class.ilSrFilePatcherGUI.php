@@ -114,7 +114,7 @@ class ilSrFilePatcherGUI
     }
 
 
-    private function index()
+    private function index(ilSrFilePatcherFormGUI $a_existing_form = null)
     {
         // back-tab
         $this->tabs->clearTargets();
@@ -126,7 +126,12 @@ class ilSrFilePatcherGUI
         );
         $this->tabs->setBackTarget($this->lng->txt("back"), $link_target);
 
-        $form = new ilSrFilePatcherFormGUI($this);
+        if($a_existing_form === null) {
+            $form = new ilSrFilePatcherFormGUI($this);
+        } else {
+            $form = $a_existing_form;
+        }
+        $form->setValuesByPost();
         $this->tpl->setContent($form->getHTML());
 
     }
@@ -134,82 +139,88 @@ class ilSrFilePatcherGUI
 
     private function showErrorReport()
     {
-        $template_dir = "Customizing/global/plugins/Services/Cron/CronHook/SrFilePatcher";
-        $file = new ilObjFile($_POST['ref_id_file']);
+        $file_patcher_form = new ilSrFilePatcherFormGUI($this);
 
-        // back-tab
-        $this->tabs->clearTargets();
-        $this->ctrl->saveParameterByClass(ilSrFilePatcherGUI::class, "ref_id");
-        $link_target = $this->ctrl->getLinkTargetByClass(ilSrFilePatcherGUI::class);
-        $this->tabs->setBackTarget($this->lng->txt("back"), $link_target);
+        if($file_patcher_form->isValid()) {
+            $template_dir = "Customizing/global/plugins/Services/Cron/CronHook/SrFilePatcher";
+            $file = new ilObjFile($_POST['ref_id_file']);
 
-        $error_report_generator = new ilFileErrorReportGenerator();
-        $error_report = $error_report_generator->getReport($file);
+            // back-tab
+            $this->tabs->clearTargets();
+            $this->ctrl->saveParameterByClass(ilSrFilePatcherGUI::class, "ref_id");
+            $link_target = $this->ctrl->getLinkTargetByClass(ilSrFilePatcherGUI::class);
+            $this->tabs->setBackTarget($this->lng->txt("back"), $link_target);
 
-        // db report
-        $db_report_tpl = new ilTemplate("tpl.db_report.html", true, true, $template_dir);
-        $db_report_tpl->setVariable("DB_REPORT_TITLE", $this->pl->txt("error_report_title_db_report"));
-        $db_report_tpl->setVariable(
-            "DB_REPORT_LABEL_CURRENT_VERSION",
-            $this->pl->txt("error_report_label_db_current_version") . ":"
-        );
-        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CURRENT_VERSION", $error_report['db_current_version']);
-        $db_report_tpl->setVariable(
-            "DB_REPORT_LABEL_CORRECT_VERSION",
-            $this->pl->txt("error_report_label_db_correct_version") . ":"
-        );
-        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CORRECT_VERSION", $error_report['db_correct_version']);
-        $db_report_tpl->setVariable(
-            "DB_REPORT_LABEL_CURRENT_MAX_VERSION",
-            $this->pl->txt("error_report_label_db_current_max_version") . ":"
-        );
-        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CURRENT_MAX_VERSION", $error_report['db_current_max_version']);
-        $db_report_tpl->setVariable(
-            "DB_REPORT_LABEL_CORRECT_MAX_VERSION",
-            $this->pl->txt("error_report_label_db_correct_max_version") . ":"
-        );
-        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CORRECT_MAX_VERSION", $error_report['db_correct_max_version']);
+            $error_report_generator = new ilFileErrorReportGenerator();
+            $error_report = $error_report_generator->getReport($file);
 
-        // remove db-data and ref_id from error_report to prevent problems in reading the array when passing it on to the table
-        unset($error_report['file_ref_id']);
-        unset($error_report['db_current_version']);
-        unset($error_report['db_correct_version']);
-        unset($error_report['db_current_max_version']);
-        unset($error_report['db_correct_max_version']);
+            // db report
+            $db_report_tpl = new ilTemplate("tpl.db_report.html", true, true, $template_dir);
+            $db_report_tpl->setVariable("DB_REPORT_TITLE", $this->pl->txt("error_report_title_db_report"));
+            $db_report_tpl->setVariable(
+                "DB_REPORT_LABEL_CURRENT_VERSION",
+                $this->pl->txt("error_report_label_db_current_version") . ":"
+            );
+            $db_report_tpl->setVariable("DB_REPORT_CONTENT_CURRENT_VERSION", $error_report['db_current_version']);
+            $db_report_tpl->setVariable(
+                "DB_REPORT_LABEL_CORRECT_VERSION",
+                $this->pl->txt("error_report_label_db_correct_version") . ":"
+            );
+            $db_report_tpl->setVariable("DB_REPORT_CONTENT_CORRECT_VERSION", $error_report['db_correct_version']);
+            $db_report_tpl->setVariable(
+                "DB_REPORT_LABEL_CURRENT_MAX_VERSION",
+                $this->pl->txt("error_report_label_db_current_max_version") . ":"
+            );
+            $db_report_tpl->setVariable("DB_REPORT_CONTENT_CURRENT_MAX_VERSION", $error_report['db_current_max_version']);
+            $db_report_tpl->setVariable(
+                "DB_REPORT_LABEL_CORRECT_MAX_VERSION",
+                $this->pl->txt("error_report_label_db_correct_max_version") . ":"
+            );
+            $db_report_tpl->setVariable("DB_REPORT_CONTENT_CORRECT_MAX_VERSION", $error_report['db_correct_max_version']);
 
-        // version report table
-        $fs_storage_file = new ilFSStorageFile();
-        $file_absolute_path = $fs_storage_file->getAbsolutePath();
-        $file_dir = substr($file_absolute_path, 0, (strpos($file_absolute_path, "ilFile/") + 7));
-        $version_report_table = new ilFileErrorReportTableGUI($this, self::CMD_DEFAULT, $error_report, $file_dir);
-        $version_report_table_tpl = new ilTemplate("tpl.version_report_table.html", true, true, $template_dir);
-        $version_report_table->setTemplate($version_report_table_tpl);
-        $version_report_table_tpl->setVariable("DB_REPORT", $db_report_tpl->get());
-        $version_report_table_tpl->setVariable(
-            "VERSION_REPORT_TABLE_TITLE",
-            $this->pl->txt("error_report_title_version_report")
-        );
-        $version_report_table_tpl->setVariable(
-            "VERSION_REPORT_TABLE_LABEL_FILE_DIR",
-            $this->pl->txt("error_report_label_file_dir") . ":"
-        );
-        $version_report_table_tpl->setVariable("VERSION_REPORT_TABLE_CONTENT_FILE_DIR", ($file_dir . "..."));
-        $version_report_table_tpl->setVariable(
-            "VERSION_REPORT_TABLE_INFO_FILE_DIR",
-            $this->pl->txt("error_report_info_file_dir")
-        );
-        $version_report_table_tpl->setContent($version_report_table->getHTML());
+            // remove db-data and ref_id from error_report to prevent problems in reading the array when passing it on to the table
+            unset($error_report['file_ref_id']);
+            unset($error_report['db_current_version']);
+            unset($error_report['db_correct_version']);
+            unset($error_report['db_current_max_version']);
+            unset($error_report['db_correct_max_version']);
 
-        // error report
-        $error_report_tpl = new ilTemplate("tpl.error_report.html", true, true, $template_dir);
-        $error_report_tpl->setVariable(
-            "ERROR_REPORT_TITLE",
-            sprintf($this->pl->txt("error_report_title"), $error_report['file_ref_id'])
-        );
-        $error_report_tpl->setVariable("VERSION_REPORT_TABLE", $version_report_table_tpl->get());
+            // version report table
+            $fs_storage_file = new ilFSStorageFile();
+            $file_absolute_path = $fs_storage_file->getAbsolutePath();
+            $file_dir = substr($file_absolute_path, 0, (strpos($file_absolute_path, "ilFile/") + 7));
+            $version_report_table = new ilFileErrorReportTableGUI($this, self::CMD_DEFAULT, $error_report, $file_dir);
+            $version_report_table_tpl = new ilTemplate("tpl.version_report_table.html", true, true, $template_dir);
+            $version_report_table->setTemplate($version_report_table_tpl);
+            $version_report_table_tpl->setVariable("DB_REPORT", $db_report_tpl->get());
+            $version_report_table_tpl->setVariable(
+                "VERSION_REPORT_TABLE_TITLE",
+                $this->pl->txt("error_report_title_version_report")
+            );
+            $version_report_table_tpl->setVariable(
+                "VERSION_REPORT_TABLE_LABEL_FILE_DIR",
+                $this->pl->txt("error_report_label_file_dir") . ":"
+            );
+            $version_report_table_tpl->setVariable("VERSION_REPORT_TABLE_CONTENT_FILE_DIR", ($file_dir . "..."));
+            $version_report_table_tpl->setVariable(
+                "VERSION_REPORT_TABLE_INFO_FILE_DIR",
+                $this->pl->txt("error_report_info_file_dir")
+            );
+            $version_report_table_tpl->setContent($version_report_table->getHTML());
 
-        // show error report
-        $this->tpl->setContent($error_report_tpl->get());
+            // error report
+            $error_report_tpl = new ilTemplate("tpl.error_report.html", true, true, $template_dir);
+            $error_report_tpl->setVariable(
+                "ERROR_REPORT_TITLE",
+                sprintf($this->pl->txt("error_report_title"), $error_report['file_ref_id'])
+            );
+            $error_report_tpl->setVariable("VERSION_REPORT_TABLE", $version_report_table_tpl->get());
+
+            // show error report
+            $this->tpl->setContent($error_report_tpl->get());
+        } else {
+            $this->index($file_patcher_form);
+        }
     }
 
 

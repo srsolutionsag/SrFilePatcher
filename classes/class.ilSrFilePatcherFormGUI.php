@@ -87,4 +87,23 @@ class ilSrFilePatcherFormGUI extends ilPropertyFormGUI
     }
 
 
+    public function isValid() {
+        $is_valid = false;
+
+        if($this->checkInput()) {
+            $ref_id_file = (int)$this->getInput("ref_id_file");
+            if(ilObjFile::_exists($ref_id_file, true, "file")) {
+                $is_valid = true;
+            } else {
+                /**
+                 * @var $input_ref_id_file ilNumberInputGUI
+                 */
+                $input_ref_id_file = $this->getItemByPostVar("ref_id_file");
+                $input_ref_id_file->setAlert(sprintf($this->pl->txt("error_no_file_for_ref_id"), $ref_id_file));
+                ilUtil::sendFailure($this->lng->txt("form_input_not_valid"));
+            }
+        }
+
+        return $is_valid;
+    }
 }

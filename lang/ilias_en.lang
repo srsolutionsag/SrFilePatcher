@@ -9,7 +9,7 @@ config_info_patching_mode#:#Warning: The plugin should always be thoroughly test
 
 error_plugin_not_activated#:#Error: Plugin not activated.
 error_no_patching_mode#:#Error: No patching mode declared. Modes can be selected inside the plugin configuration.
-error_no_file_for_ref_id#:# Error: No file found for ref_id %s. Please specify a valid ref_id inside the plugin configuration.
+error_no_file_for_ref_id#:# No file found for ref_id %s. Please insert a valid ref_id.
 
 form_title_single_file_patcher#:#Patch Single File
 form_input_ref_id_file#:#Ref-Id of File
