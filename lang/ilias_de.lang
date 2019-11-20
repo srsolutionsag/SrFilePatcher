@@ -40,7 +40,6 @@ table_column_patch_possible#:#Patch möglich
 
 table_cmd_button_patch#:#Patchen
 
-confirmation_question_patch#:#Wollen Sie die Datei mit der Ref-Id %s wirklich patchen? Dabei würden reparable Versionen gepatcht und irreparable Versionen gelöscht.
-confirmation_question_patch_with_file_deletion#:#Wollen Sie die Datei mit der Ref-Id %s wirklich patchen? Dabei würde die Datei gelöscht da festgestellt wurde, dass all ihre Versionen irreparabel beschädigt sind.
+confirmation_question_patch#:#Wollen Sie die Datei mit der Ref-Id %s wirklich patchen? Dabei würden reparable Versionen gepatcht und irreparable Versionen als verloren markiert.
 confirmation_table_title_fixable_versions#:#Reparable Versionen
 confirmation_table_title_unfixable_versions#:#Irreparable Versionen

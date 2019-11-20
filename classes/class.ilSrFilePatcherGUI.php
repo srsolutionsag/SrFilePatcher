@@ -35,7 +35,6 @@ class ilSrFilePatcherGUI
     const CMD_SHOW_CONFIRMATION_REQUEST = "showConfirmationRequest";
     const CMD_CANCEL_PATCH = "cancelPatch";
     const CMD_CONFIRMED_PATCH = "confirmPatch";
-    const CMD_CONFIRMED_PATCH_WITH_FILE_DELETION = "confirmPatchWithFileDeletion";
     /**
      * @var ilCtrl
      */
@@ -110,7 +109,6 @@ class ilSrFilePatcherGUI
                     case self::CMD_DOWNLOAD_VERSION:
                     case self::CMD_CANCEL_PATCH:
                     case self::CMD_CONFIRMED_PATCH:
-                    case self::CMD_CONFIRMED_PATCH_WITH_FILE_DELETION:
                         $this->$cmd();
                         break;
                     default:
@@ -280,10 +278,12 @@ class ilSrFilePatcherGUI
         // set request elements that are the same no matter the number of fixable versions
         $conf_gui = new ilConfirmationGUI();
         $conf_gui->setFormAction($this->ctrl->getFormAction($this, self::CMD_DEFAULT));
+        $conf_gui->setConfirm($this->lng->txt("confirm"), self::CMD_CONFIRMED_PATCH);
         $conf_gui->setCancel($this->lng->txt("cancel"), self::CMD_SHOW_ERROR_REPORT);
         $conf_gui->addHiddenItem("ref_id_file", $_POST['file_ref_id']);
 
-        $confirmation_request_tpl = new ilTemplate("tpl.confirmation_request.html", true, true, self::TEMPLATE_DIR);
+        // ask for confirmation providing the information which versions will be patched and which ones will be marked as lost
+        ilUtil::sendQuestion(sprintf($this->pl->txt("confirmation_question_patch"), $_POST['file_ref_id']));
 
         // determine which versions are fixable and which are not
         $fixable_versions = [];
@@ -298,38 +298,17 @@ class ilSrFilePatcherGUI
             }
         }
 
-        // depending if there are or aren't any fixable versions different questions will be asked
-        if(empty($fixable_versions)) {
-            // ask for confirmation providing the information that doing so will lead to the file being deleted
-            ilUtil::sendQuestion(sprintf(
-                $this->pl->txt("confirmation_question_patch_with_file_deletion"),
-                $_POST['file_ref_id']
-            ));
-            $conf_gui->setConfirm($this->lng->txt("confirm"), self::CMD_CONFIRMED_PATCH_WITH_FILE_DELETION);
-            $confirmation_request_tpl->setVariable("CONFIRMATION_BUTTONS_TOP", $conf_gui->getHTML());
-        } else {
-            // ask for confirmation providing the information which versions will be patched and which ones will be deleted
-            ilUtil::sendQuestion(sprintf(
-                $this->pl->txt("confirmation_question_patch"),
-                $_POST['file_ref_id']
-            ));
-            $conf_gui->setConfirm($this->lng->txt("confirm"), self::CMD_CONFIRMED_PATCH);
+        $confirmation_request_tpl = new ilTemplate("tpl.confirmation_request.html", true, true, self::TEMPLATE_DIR);
+        $confirmation_request_tpl->setVariable(
+            "CONFIRMATION_BUTTONS_TOP",
+            $conf_gui->getHTML()
+        );
+        if(!empty($fixable_versions)) {
             // show versions that would be patched
             $fixable_versions_table = new ilSrFilePatcherConfirmationTableGUI(
                 $this,
                 self::CMD_DEFAULT,
                 $fixable_versions
-            );
-            // show versions that would be deleted
-            $unfixable_versions_table = new ilSrFilePatcherConfirmationTableGUI(
-                $this,
-                self::CMD_DEFAULT,
-                $unfixable_versions
-            );
-
-            $confirmation_request_tpl->setVariable(
-                "CONFIRMATION_BUTTONS_TOP",
-                $conf_gui->getHTML()
             );
             $confirmation_request_tpl->setVariable(
                 "FIXABLE_VERSIONS_TABLE_TITLE",
@@ -339,21 +318,27 @@ class ilSrFilePatcherGUI
                 "FIXABLE_VERSIONS_TABLE",
                 $fixable_versions_table->getHTML()
             );
-            if(!empty($unfixable_versions)) {
-                $confirmation_request_tpl->setVariable(
-                    "UNFIXABLE_VERSIONS_TABLE_TITLE",
-                    $this->pl->txt('confirmation_table_title_unfixable_versions')
-                );
-                $confirmation_request_tpl->setVariable(
-                    "UNFIXABLE_VERSIONS_TABLE",
-                    $unfixable_versions_table->getHTML()
-                );
-            }
+        }
+        if(!empty($unfixable_versions)) {
+            // show versions that would be marked as lost
+            $unfixable_versions_table = new ilSrFilePatcherConfirmationTableGUI(
+                $this,
+                self::CMD_DEFAULT,
+                $unfixable_versions
+            );
             $confirmation_request_tpl->setVariable(
-                "CONFIRMATION_BUTTONS_BOTTOM",
-                $conf_gui->getHTML()
+                "UNFIXABLE_VERSIONS_TABLE_TITLE",
+                $this->pl->txt('confirmation_table_title_unfixable_versions')
+            );
+            $confirmation_request_tpl->setVariable(
+                "UNFIXABLE_VERSIONS_TABLE",
+                $unfixable_versions_table->getHTML()
             );
         }
+        $confirmation_request_tpl->setVariable(
+            "CONFIRMATION_BUTTONS_BOTTOM",
+            $conf_gui->getHTML()
+        );
 
         $this->tpl->setContent($confirmation_request_tpl->get());
     }
@@ -381,15 +366,6 @@ class ilSrFilePatcherGUI
     }
 
 
-    private function confirmPatchWithFileDeletion() {
-        $file = new ilObjFile($_POST['ref_id_file']);
-        // $file->delete(); TODO: comment in after testing
-
-        ilUtil::sendSuccess($this->pl->txt("success_file_deleted"));
-        $this->ctrl->redirectByClass(self::class, self::CMD_DEFAULT);
-    }
-
-
     /**
      * @param ilObjFile $a_file
      * @param array     $a_error_report
@@ -407,13 +383,12 @@ class ilSrFilePatcherGUI
      */
     private function fixHistoryEntriesOfFile(ilObjFile $a_file, array $a_error_report) {
         $broken_history_entries = $this->getVersionsFromHistoryOfFile($a_file);
-        $error_report_entries = $a_error_report;
 
         foreach ($broken_history_entries as $broken_history_entry) {
-            foreach ($error_report_entries as $error_report_entry) {
+            foreach ($a_error_report as $error_report_entry) {
                 if(isset($error_report_entry['hist_entry_id'])
                     && ($error_report_entry['hist_entry_id']) == $broken_history_entry['hist_entry_id']) {
-                    // only fix the history entry if a patch is possible, delete the entry otherwise
+                    // fix the history entry if a patch is possible or mark the version as lost otherwise
                     if($error_report_entry['patch_possible']) {
                         // obtain data for fixing the history entry
                         $fixed_info_params = $this->getFixedInfoParams($broken_history_entry, $error_report_entry);
@@ -429,8 +404,16 @@ class ilSrFilePatcherGUI
                         //     true
                         // );
                     } else {
-                        $tst = 0;
-                        // ilHistory::_removeEntryByHistoryID($error_report_entry['hist_entry_id']); TODO: comment in after testing
+                        // mark version as lost
+                        $broken_history_entry['action'] = "lost";
+                        // ilHistory::_createEntry( TODO: comment in after testing
+                        //     $broken_history_entry['obj_id'],
+                        //     $broken_history_entry['action'],
+                        //     $broken_history_entry['info_params'],
+                        //     $broken_history_entry['obj_type'],
+                        //     $broken_history_entry['user_comment'],
+                        //     true
+                        // );
                     }
                 }
             }
@@ -446,25 +429,19 @@ class ilSrFilePatcherGUI
         $error_report_entries = $a_error_report;
 
         foreach ($error_report_entries as $error_report_entry) {
-            if(isset($error_report_entry['current_path'])
-                && isset($error_report_entry['correct_path'])
-                && isset($error_report_entry['patch_possible'])
-            ) {
+            // only try to fix the version if a patch is possible i.e. the file-version wasn't deleted
+            if(isset($error_report_entry['patch_possible']) && $error_report_entry['patch_possible']) {
                 $current_path = $error_report_entry['current_path'];
                 $correct_path = $error_report_entry['correct_path'];
-                // only fix the filesystem version if a patch is possible, delete the version otherwise
-                if($error_report_entry['patch_possible']) {
-                    // rename the file to be moved in case a name-duplicate exists in its correct path to prevent overwriting.
-                    // (the renaming will be undone once the name duplicate has been moved too)
-                    if(file_exists($correct_path)) {
-                        $correct_path .= self::TEMP_APPENDIX;
-                    }
-                    // move the file to its correct location
-                    // rename($current_path, $correct_path);TODO: comment in after testing
-                } else {
-                    $tst = 0;
-                    // unlink($current_path);TODO: comment in after testing
+
+                // rename the file to be moved in case a name-duplicate exists in its correct path to prevent overwriting.
+                // (the renaming will be undone once the name duplicate has been moved too)
+                if(file_exists($correct_path)) {
+                    $correct_path .= self::TEMP_APPENDIX;
                 }
+
+                // move the file to its correct location
+                // rename($current_path, $correct_path);TODO: comment in after testing
             }
         }
 

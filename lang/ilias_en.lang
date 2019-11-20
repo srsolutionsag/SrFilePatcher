@@ -40,7 +40,6 @@ table_column_patch_possible#:#Patch Possible
 
 table_cmd_button_patch#:#Patch
 
-confirmation_question_patch#:#Do you really want to patch the file with ref-id %s? Doing so will lead to fixable versions being patched and unfixable ones being deleted.
-confirmation_question_patch_with_file_deletion#:#Do you really want to patch the file with ref-id %s? Doing so will lead to the file being deleted as all its versions have been ascertained unfixable.
+confirmation_question_patch#:#Do you really want to patch the file with ref-id %s? Doing so will lead to fixable versions being patched and unfixable ones being marked as lost.
 confirmation_table_title_fixable_versions#:#Fixable Versions
 confirmation_table_title_unfixable_versions#:#Unfixable Versions
