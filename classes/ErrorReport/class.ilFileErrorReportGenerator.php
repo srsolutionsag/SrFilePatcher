@@ -11,6 +11,8 @@ use srag\DIC\SrFilePatcher\DICTrait;
  * Class ilFileErrorReportGenerator
  *
  * @author  studer + raimann ag - Team Core 1 <support-core1@studer-raimann.ch>
+ *
+ * @ilCtrl_IsCalledBy   ilFileErrorReportGenerator: ilUIPluginRouterGUI
  */
 class ilFileErrorReportGenerator
 {
@@ -120,6 +122,86 @@ class ilFileErrorReportGenerator
         $report['db_correct_max_version'] = $this->getCorrectMaxVersion($a_file);
 
         return $report;
+    }
+
+
+    public function getReportHTML() {
+        if(isset($_POST['ref_id_file'])) {
+            $ref_id_file = $_POST['ref_id_file'];
+        } else {
+            $ref_id_file = $_GET['ref_id_file'];
+        }
+        $file = new ilObjFile($ref_id_file);
+
+        // error report
+        $error_report = $this->getReport($file);
+        $error_report_tpl = new ilTemplate("tpl.report.html", true, true, ilSrFilePatcherGUI::TEMPLATE_DIR);
+        $error_report_tpl->setVariable(
+            "REPORT_TITLE",
+            sprintf($this->pl->txt("error_report_title"), $error_report['file_ref_id'])
+        );
+
+        // db report
+        $db_report_tpl = new ilTemplate("tpl.file_error_report_db_section.html", true, true, ilSrFilePatcherGUI::TEMPLATE_DIR);
+        $db_report_tpl->setVariable("DB_REPORT_TITLE", $this->pl->txt("error_report_title_db_report"));
+        $db_report_tpl->setVariable(
+            "DB_REPORT_LABEL_CURRENT_VERSION",
+            $this->pl->txt("error_report_label_db_current_version") . ":"
+        );
+        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CURRENT_VERSION", $error_report['db_current_version']);
+        $db_report_tpl->setVariable(
+            "DB_REPORT_LABEL_CORRECT_VERSION",
+            $this->pl->txt("error_report_label_db_correct_version") . ":"
+        );
+        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CORRECT_VERSION", $error_report['db_correct_version']);
+        $db_report_tpl->setVariable(
+            "DB_REPORT_LABEL_CURRENT_MAX_VERSION",
+            $this->pl->txt("error_report_label_db_current_max_version") . ":"
+        );
+        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CURRENT_MAX_VERSION", $error_report['db_current_max_version']);
+        $db_report_tpl->setVariable(
+            "DB_REPORT_LABEL_CORRECT_MAX_VERSION",
+            $this->pl->txt("error_report_label_db_correct_max_version") . ":"
+        );
+        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CORRECT_MAX_VERSION", $error_report['db_correct_max_version']);
+
+        // remove db-data and ref_id from error_report to prevent problems in reading the array when passing it on to the table
+        unset($error_report['file_ref_id']);
+        unset($error_report['db_current_version']);
+        unset($error_report['db_correct_version']);
+        unset($error_report['db_current_max_version']);
+        unset($error_report['db_correct_max_version']);
+
+        // version report table
+        $fs_storage_file = new ilFSStorageFile();
+        $file_absolute_path = $fs_storage_file->getAbsolutePath();
+        $file_dir = substr($file_absolute_path, 0, (strpos($file_absolute_path, "ilFile/") + 7));
+        $version_report_table = new ilFileErrorReportTableGUI(
+            $this->parent,
+            ilSrFilePatcherGUI::CMD_DEFAULT,
+            $error_report,
+            $file_dir
+        );
+        $version_report_table_tpl = new ilTemplate("tpl.report_table.html", true, true, ilSrFilePatcherGUI::TEMPLATE_DIR);
+        $version_report_table->setTemplate($version_report_table_tpl);
+        $version_report_table_tpl->setVariable("DB_REPORT", $db_report_tpl->get());
+        $version_report_table_tpl->setVariable(
+            "REPORT_TABLE_TITLE",
+            $this->pl->txt("error_report_title_version_report")
+        );
+        $version_report_table_tpl->setVariable(
+            "REPORT_TABLE_LABEL_FILE_DIR",
+            $this->pl->txt("error_report_label_file_dir") . ":"
+        );
+        $version_report_table_tpl->setVariable("REPORT_TABLE_CONTENT_FILE_DIR", ($file_dir . "..."));
+        $version_report_table_tpl->setVariable(
+            "REPORT_TABLE_INFO_FILE_DIR",
+            $this->pl->txt("error_report_info_file_dir")
+        );
+        $version_report_table_tpl->setContent($version_report_table->getHTML());
+        $error_report_tpl->setVariable("REPORT_TABLE", $version_report_table_tpl->get());
+
+        return $error_report_tpl->get();
     }
 
 

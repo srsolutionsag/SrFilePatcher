@@ -2,19 +2,17 @@
 
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see https://github.com/ILIAS-eLearning/ILIAS/tree/trunk/docs/LICENSE */
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../../vendor/autoload.php";
 
-use ILIAS\Data\DataSize;
-use ILIAS\Filesystem\Util\LegacyPathHelper;
 use srag\Plugins\SrFilePatcher\Utils\SrFilePatcherTrait;
 use srag\DIC\SrFilePatcher\DICTrait;
 
 /**
- * Class ilSrFilePatcherConfirmationTableGUI
+ * Class ilFilePatchConfirmationRequestTableGUI
  *
  * @author  studer + raimann ag - Team Core 1 <support-core1@studer-raimann.ch>
  */
-class ilSrFilePatcherConfirmationTableGUI extends ilTable2GUI
+class ilFilePatchConfirmationRequestTableGUI extends ilTable2GUI
 {
 
     use DICTrait;
@@ -66,7 +64,7 @@ class ilSrFilePatcherConfirmationTableGUI extends ilTable2GUI
 
         // Appearance
         $template_dir = "Customizing/global/plugins/Services/Cron/CronHook/SrFilePatcher";
-        $this->setRowTemplate("tpl.confirmation_table_row.html", $template_dir);
+        $this->setRowTemplate("tpl.file_patch_confirmation_request_table_row.html", $template_dir);
         $this->setLimit(9999);
 
         // Form

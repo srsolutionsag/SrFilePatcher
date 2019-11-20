@@ -90,7 +90,7 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
 
         // Appearance
         $template_dir = "Customizing/global/plugins/Services/Cron/CronHook/SrFilePatcher";
-        $this->setRowTemplate("tpl.version_report_table_row.html", $template_dir);
+        $this->setRowTemplate("tpl.file_error_report_table_row.html", $template_dir);
         $this->setLimit(9999);
 
         // Form

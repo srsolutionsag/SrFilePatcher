@@ -158,86 +158,15 @@ class ilSrFilePatcherGUI
 
     private function showErrorReport()
     {
-        // depending whether this function is called from the form or confirmation request the ref-id is passed by $_POST or $_GET
-        if(isset($_POST['ref_id_file'])) {
-            $ref_id_file = $_POST['ref_id_file'];
-        } else {
-            $ref_id_file = $_GET['ref_id_file'];
-        }
-        $file = new ilObjFile($ref_id_file);
-
         // back-tab
         $this->tabs->clearTargets();
         $this->ctrl->saveParameterByClass(ilSrFilePatcherGUI::class, "ref_id");
         $link_target = $this->ctrl->getLinkTargetByClass(ilSrFilePatcherGUI::class);
         $this->tabs->setBackTarget($this->lng->txt("back"), $link_target);
 
-        // error report
         $error_report_generator = new ilFileErrorReportGenerator($this);
-        $error_report = $error_report_generator->getReport($file);
-        $error_report_tpl = new ilTemplate("tpl.error_report.html", true, true, self::TEMPLATE_DIR);
-        $error_report_tpl->setVariable(
-            "ERROR_REPORT_TITLE",
-            sprintf($this->pl->txt("error_report_title"), $error_report['file_ref_id'])
-        );
-
-        // db report
-        $db_report_tpl = new ilTemplate("tpl.db_report.html", true, true, self::TEMPLATE_DIR);
-        $db_report_tpl->setVariable("DB_REPORT_TITLE", $this->pl->txt("error_report_title_db_report"));
-        $db_report_tpl->setVariable(
-            "DB_REPORT_LABEL_CURRENT_VERSION",
-            $this->pl->txt("error_report_label_db_current_version") . ":"
-        );
-        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CURRENT_VERSION", $error_report['db_current_version']);
-        $db_report_tpl->setVariable(
-            "DB_REPORT_LABEL_CORRECT_VERSION",
-            $this->pl->txt("error_report_label_db_correct_version") . ":"
-        );
-        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CORRECT_VERSION", $error_report['db_correct_version']);
-        $db_report_tpl->setVariable(
-            "DB_REPORT_LABEL_CURRENT_MAX_VERSION",
-            $this->pl->txt("error_report_label_db_current_max_version") . ":"
-        );
-        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CURRENT_MAX_VERSION", $error_report['db_current_max_version']);
-        $db_report_tpl->setVariable(
-            "DB_REPORT_LABEL_CORRECT_MAX_VERSION",
-            $this->pl->txt("error_report_label_db_correct_max_version") . ":"
-        );
-        $db_report_tpl->setVariable("DB_REPORT_CONTENT_CORRECT_MAX_VERSION", $error_report['db_correct_max_version']);
-
-        // remove db-data and ref_id from error_report to prevent problems in reading the array when passing it on to the table
-        unset($error_report['file_ref_id']);
-        unset($error_report['db_current_version']);
-        unset($error_report['db_correct_version']);
-        unset($error_report['db_current_max_version']);
-        unset($error_report['db_correct_max_version']);
-
-        // version report table
-        $fs_storage_file = new ilFSStorageFile();
-        $file_absolute_path = $fs_storage_file->getAbsolutePath();
-        $file_dir = substr($file_absolute_path, 0, (strpos($file_absolute_path, "ilFile/") + 7));
-        $version_report_table = new ilFileErrorReportTableGUI($this, self::CMD_DEFAULT, $error_report, $file_dir);
-        $version_report_table_tpl = new ilTemplate("tpl.version_report_table.html", true, true, self::TEMPLATE_DIR);
-        $version_report_table->setTemplate($version_report_table_tpl);
-        $version_report_table_tpl->setVariable("DB_REPORT", $db_report_tpl->get());
-        $version_report_table_tpl->setVariable(
-            "VERSION_REPORT_TABLE_TITLE",
-            $this->pl->txt("error_report_title_version_report")
-        );
-        $version_report_table_tpl->setVariable(
-            "VERSION_REPORT_TABLE_LABEL_FILE_DIR",
-            $this->pl->txt("error_report_label_file_dir") . ":"
-        );
-        $version_report_table_tpl->setVariable("VERSION_REPORT_TABLE_CONTENT_FILE_DIR", ($file_dir . "..."));
-        $version_report_table_tpl->setVariable(
-            "VERSION_REPORT_TABLE_INFO_FILE_DIR",
-            $this->pl->txt("error_report_info_file_dir")
-        );
-        $version_report_table_tpl->setContent($version_report_table->getHTML());
-        $error_report_tpl->setVariable("VERSION_REPORT_TABLE", $version_report_table_tpl->get());
-
-        // show error report
-        $this->tpl->setContent($error_report_tpl->get());
+        $error_report_html = $error_report_generator->getReportHTML();
+        $this->tpl->setContent($error_report_html);
     }
 
 
@@ -259,98 +188,20 @@ class ilSrFilePatcherGUI
 
     private function patch()
     {
-        // error report needs to be generated again as the tables hidden input can't send arrays (would return "Array")
-        $file = new ilObjFile($_POST['file_ref_id']);
-        $error_report_generator = new ilFileErrorReportGenerator($this);
-        $error_report = $error_report_generator->getReport($file);
-
-        $this->showConfirmationRequest($error_report);
+        $this->showConfirmationRequest();
     }
 
 
-    private function showConfirmationRequest(array $a_error_report) {
+    private function showConfirmationRequest() {
         // back-tab
         $this->tabs->clearTargets();
         $this->ctrl->setParameterByClass(self::class, "ref_id_file", $_POST['file_ref_id']);
         $link_target = $this->ctrl->getLinkTargetByClass(self::class, self::CMD_SHOW_ERROR_REPORT);
         $this->tabs->setBackTarget($this->lng->txt("back"), $link_target);
 
-        // set request elements that are the same no matter the number of fixable versions
-        $conf_gui = new ilConfirmationGUI();
-        $conf_gui->setFormAction($this->ctrl->getFormAction($this, self::CMD_DEFAULT));
-        $conf_gui->setConfirm($this->lng->txt("confirm"), self::CMD_CONFIRMED_PATCH);
-        $conf_gui->setCancel($this->lng->txt("cancel"), self::CMD_SHOW_ERROR_REPORT);
-        $conf_gui->addHiddenItem("ref_id_file", $_POST['file_ref_id']);
-
-        // ask for confirmation providing the information which versions will be patched and which ones will be marked as lost
-        ilUtil::sendQuestion(sprintf($this->pl->txt("confirmation_question_patch"), $_POST['file_ref_id']));
-
-        // determine which versions are fixable and which are not
-        $fixable_versions = [];
-        $unfixable_versions = [];
-        foreach ($a_error_report as $error_report_entry) {
-            if(isset($error_report_entry['patch_possible'])) {
-                if($error_report_entry['patch_possible']) {
-                    $fixable_versions[] = $error_report_entry;
-                } else {
-                    $unfixable_versions[] = $error_report_entry;
-                }
-            }
-        }
-
-        $confirmation_request_tpl = new ilTemplate("tpl.confirmation_request.html", true, true, self::TEMPLATE_DIR);
-        $confirmation_request_tpl->setVariable(
-            "CONFIRMATION_BUTTONS_TOP",
-            $conf_gui->getHTML()
-        );
-        $confirmation_request_tpl->setVariable(
-            "FIXABLE_VERSIONS_TABLE_TITLE",
-            $this->pl->txt('confirmation_table_title_fixable_versions')
-        );
-        if(!empty($fixable_versions)) {
-            // show versions that would be patched
-            $fixable_versions_table = new ilSrFilePatcherConfirmationTableGUI(
-                $this,
-                self::CMD_DEFAULT,
-                $fixable_versions
-            );
-            $confirmation_request_tpl->setVariable(
-                "FIXABLE_VERSIONS_TABLE",
-                $fixable_versions_table->getHTML()
-            );
-        } else {
-            $confirmation_request_tpl->setVariable(
-                "FIXABLE_VERSIONS_TABLE",
-                $this->pl->txt("confirmation_table_replacement_no_fixable_versions") . "<br><br>"
-            );
-        }
-        $confirmation_request_tpl->setVariable(
-            "UNFIXABLE_VERSIONS_TABLE_TITLE",
-            $this->pl->txt('confirmation_table_title_unfixable_versions')
-        );
-        if(!empty($unfixable_versions)) {
-            // show versions that would be marked as lost
-            $unfixable_versions_table = new ilSrFilePatcherConfirmationTableGUI(
-                $this,
-                self::CMD_DEFAULT,
-                $unfixable_versions
-            );
-            $confirmation_request_tpl->setVariable(
-                "UNFIXABLE_VERSIONS_TABLE",
-                $unfixable_versions_table->getHTML()
-            );
-        } else {
-            $confirmation_request_tpl->setVariable(
-                "UNFIXABLE_VERSIONS_TABLE",
-                $this->pl->txt("confirmation_table_replacement_no_unfixable_versions") . "<br><br>"
-            );
-        }
-        $confirmation_request_tpl->setVariable(
-            "CONFIRMATION_BUTTONS_BOTTOM",
-            $conf_gui->getHTML()
-        );
-
-        $this->tpl->setContent($confirmation_request_tpl->get());
+        $patch_confirmation_request_generator = new ilFilePatchConfirmationRequestGenerator($this);
+        $patch_confirmation_request_html = $patch_confirmation_request_generator->getRequestHTML();
+        $this->tpl->setContent($patch_confirmation_request_html);
     }
 
 
