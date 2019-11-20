@@ -73,7 +73,11 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         $this->setId(self::class);
         parent::__construct($calling_gui_class, $a_parent_cmd, "");
         $this->error_report = $a_error_report;
-        $this->file_ref_id = $this->error_report['file_ref_id'];
+        if(isset($_POST['ref_id_file'])) {
+            $this->file_ref_id = $_POST['ref_id_file'];
+        } else {
+            $this->file_ref_id = $_GET['ref_id_file'];
+        }
         $this->file_dir = $a_file_dir;
         $this->current_version = (int) $this->error_report['db_current_version'];
         $this->max_version = (int) $this->error_report['db_current_max_version'];
@@ -97,6 +101,7 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         $this->addColumn($this->pl->txt("table_column_correct_version"), "", "1");
         $this->addColumn($this->lng->txt("date"));
         $this->addColumn($this->lng->txt("filename"));
+        $this->addColumn($this->pl->txt("table_column_uploaded_by"));
         $this->addColumn($this->pl->txt("table_column_current_path"));
         $this->addColumn($this->pl->txt("table_column_correct_path"));
         $this->addColumn($this->pl->txt("table_column_numbered_correctly"));
@@ -104,6 +109,8 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         $this->addColumn($this->pl->txt("table_column_folder_exists"));
         $this->addColumn($this->pl->txt("table_column_file_exists"));
         $this->addColumn($this->pl->txt("table_column_patch_possible"));
+
+        $this->addHiddenInput("file_ref_id", $this->file_ref_id);
 
         $this->addCommandButton(ilSrFilePatcherGUI::CMD_PATCH, $this->pl->txt("table_cmd_button_patch"));
         $this->addCommandButton(ilSrFilePatcherGUI::CMD_DEFAULT, $this->lng->txt('cancel'));
@@ -148,6 +155,10 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
         // reset history parameter
         $this->ctrl->setParameter($this->parent_obj, ilSrFilePatcherGUI::HIST_ID, "");
 
+        // get user name
+        $name = ilObjUser::_lookupName($a_set["user_id"]);
+        $username = trim($name["title"] . " " . $name["firstname"] . " " . $name["lastname"]);
+
         // fill template
         $this->tpl->setVariable("TXT_CURRENT_VERSION", $current_version);
         $this->tpl->setVariable("TXT_CORRECT_VERSION", $correct_version);
@@ -160,6 +171,7 @@ class ilFileErrorReportTableGUI extends ilTable2GUI
             $this->tpl->setVariable("LINK_CLOSING_TAG", $link_closing_tag);
         }
         $this->tpl->setVariable("TXT_FILENAME", $filename);
+        $this->tpl->setVariable("TXT_UPLOADED_BY", $username);
         $this->tpl->setVariable("TXT_CURRENT_PATH", $current_path);
         $this->tpl->setVariable("TXT_CORRECT_PATH", $correct_path);
         $this->tpl->setVariable("TXT_NUMBERED_CORRECTLY", $numbered_correctly);

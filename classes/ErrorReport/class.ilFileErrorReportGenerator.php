@@ -31,6 +31,10 @@ class ilFileErrorReportGenerator
      */
     private $log;
     /**
+     * @var ilSrFilePatcherGUI
+     */
+    protected $parent;
+    /**
      * @var ilSrFilePatcherPlugin
      */
     protected $pl;
@@ -39,11 +43,12 @@ class ilFileErrorReportGenerator
     /**
      * ilFileErrorReportGenerator constructor.
      */
-    public function __construct()
+    public function __construct(ilSrFilePatcherGUI $a_parent)
     {
         $this->log = self::dic()->logger()->root();
         $this->ctrl = self::dic()->ctrl();
         $this->lng = self::dic()->language();
+        $this->parent = $a_parent;
         $this->pl = ilSrFilePatcherPlugin::getInstance();
     }
 
@@ -76,6 +81,7 @@ class ilFileErrorReportGenerator
             $report[$hist_entry_id]['correct_version'] = $version['correct_version'];
             $report[$hist_entry_id]['date'] = $version['date'];
             $report[$hist_entry_id]['filename'] = $version['filename'];
+            $report[$hist_entry_id]['user_id'] = $version['user_id'];
 
             if (in_array($version, $incorrectly_numbered_versions)) {
                 $report[$hist_entry_id]['numbered_correctly'] = false;
@@ -153,28 +159,9 @@ class ilFileErrorReportGenerator
     }
 
 
-    /**
-     * @param ilObjFile $a_file
-     *
-     * @return array
-     */
-    private function getVersions(ilObjFile $a_file)
-    {
-        $versions = (array) ilHistory::_getEntriesForObject($a_file->getId(), $a_file->getType());
-
-        // extract information from info_params (contains version and max_version)
-        foreach ($versions as $index => $version) {
-            $params = $this->parseInfoParams($version);
-            $versions[$index] = array_merge($version, $params);
-        }
-
-        return $versions;
-    }
-
-
     private function getExtendedVersions(ilObjFile $a_file)
     {
-        $versions = $this->getVersions($a_file);
+        $versions = $this->parent->getVersionsFromHistoryOfFile($a_file);
         $extended_versions = [];
 
         $old_versions = $this->getOldVersions($versions);
@@ -495,52 +482,5 @@ class ilFileErrorReportGenerator
         }
 
         return $correct_path;
-    }
-
-
-    /**
-     * Function copied from ilObjFile
-     *
-     * @param $entry
-     *
-     * @return array
-     */
-    private function parseInfoParams($entry)
-    {
-        $data = explode(",", $entry["info_params"]);
-
-        // bugfix: first created file had no version number
-        // this is a workaround for all files created before the bug was fixed
-        if (empty($data[1])) {
-            $data[1] = "1";
-        }
-
-        if (empty($data[2])) {
-            $data[2] = "1";
-        }
-
-        $result = array(
-            "filename"         => $data[0],
-            "version"          => $data[1],
-            "max_version"      => $data[2],
-            "rollback_version" => "",
-            "rollback_user_id" => "",
-        );
-
-        // if rollback, the version contains the rollback version as well
-        // bugfix mantis 26236: rollback info is read from version to ensure compatibility with older ilias versions
-        if ($entry["action"] == "rollback") {
-            $tokens = explode("|", $result["version"]);
-            if (count($tokens) > 1) {
-                $result["version"] = $tokens[0];
-                $result["rollback_version"] = $tokens[1];
-
-                if (count($tokens) > 2) {
-                    $result["rollback_user_id"] = $tokens[2];
-                }
-            }
-        }
-
-        return $result;
     }
 }

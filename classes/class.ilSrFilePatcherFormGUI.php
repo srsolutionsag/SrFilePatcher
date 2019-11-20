@@ -72,7 +72,7 @@ class ilSrFilePatcherFormGUI extends ilPropertyFormGUI
 
         // Save and cancel buttons
         $this->ctrl->saveParameterByClass(ilSrFilePatcherGUI::class, "ref_id");
-        $this->addCommandButton(ilSrFilePatcherGUI::CMD_SHOW_ERROR_REPORT, $this->pl->txt('form_cmd_button_show_report'));
+        $this->addCommandButton(ilSrFilePatcherGUI::CMD_VALIDATE_FORM, $this->pl->txt('form_cmd_button_show_report'));
         $this->addCommandButton(ilSrFilePatcherGUI::CMD_CANCEL, $this->lng->txt('cancel'));
     }
 
