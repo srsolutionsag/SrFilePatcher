@@ -43,3 +43,5 @@ table_cmd_button_patch#:#Patch
 confirmation_question_patch#:#Do you really want to patch the file with ref-id %s? Doing so will lead to fixable versions being patched and unfixable ones being marked as lost.
 confirmation_table_title_fixable_versions#:#Fixable Versions
 confirmation_table_title_unfixable_versions#:#Unfixable Versions
+confirmation_table_replacement_no_fixable_versions#:#There are no fixable versions
+confirmation_table_replacement_no_unfixable_versions#:#There are no unfixable versions

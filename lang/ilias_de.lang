@@ -43,3 +43,5 @@ table_cmd_button_patch#:#Patchen
 confirmation_question_patch#:#Wollen Sie die Datei mit der Ref-Id %s wirklich patchen? Dabei würden reparable Versionen gepatcht und irreparable Versionen als verloren markiert.
 confirmation_table_title_fixable_versions#:#Reparable Versionen
 confirmation_table_title_unfixable_versions#:#Irreparable Versionen
+confirmation_table_replacement_no_fixable_versions#:#Keine reparablen Versionen vorhanden
+confirmation_table_replacement_no_unfixable_versions#:#Keine irreparablen Versionen vorhanden

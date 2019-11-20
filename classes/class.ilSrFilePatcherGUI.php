@@ -303,6 +303,10 @@ class ilSrFilePatcherGUI
             "CONFIRMATION_BUTTONS_TOP",
             $conf_gui->getHTML()
         );
+        $confirmation_request_tpl->setVariable(
+            "FIXABLE_VERSIONS_TABLE_TITLE",
+            $this->pl->txt('confirmation_table_title_fixable_versions')
+        );
         if(!empty($fixable_versions)) {
             // show versions that would be patched
             $fixable_versions_table = new ilSrFilePatcherConfirmationTableGUI(
@@ -311,14 +315,19 @@ class ilSrFilePatcherGUI
                 $fixable_versions
             );
             $confirmation_request_tpl->setVariable(
-                "FIXABLE_VERSIONS_TABLE_TITLE",
-                $this->pl->txt('confirmation_table_title_fixable_versions')
-            );
-            $confirmation_request_tpl->setVariable(
                 "FIXABLE_VERSIONS_TABLE",
                 $fixable_versions_table->getHTML()
             );
+        } else {
+            $confirmation_request_tpl->setVariable(
+                "FIXABLE_VERSIONS_TABLE",
+                $this->pl->txt("confirmation_table_replacement_no_fixable_versions") . "<br><br>"
+            );
         }
+        $confirmation_request_tpl->setVariable(
+            "UNFIXABLE_VERSIONS_TABLE_TITLE",
+            $this->pl->txt('confirmation_table_title_unfixable_versions')
+        );
         if(!empty($unfixable_versions)) {
             // show versions that would be marked as lost
             $unfixable_versions_table = new ilSrFilePatcherConfirmationTableGUI(
@@ -327,12 +336,13 @@ class ilSrFilePatcherGUI
                 $unfixable_versions
             );
             $confirmation_request_tpl->setVariable(
-                "UNFIXABLE_VERSIONS_TABLE_TITLE",
-                $this->pl->txt('confirmation_table_title_unfixable_versions')
-            );
-            $confirmation_request_tpl->setVariable(
                 "UNFIXABLE_VERSIONS_TABLE",
                 $unfixable_versions_table->getHTML()
+            );
+        } else {
+            $confirmation_request_tpl->setVariable(
+                "UNFIXABLE_VERSIONS_TABLE",
+                $this->pl->txt("confirmation_table_replacement_no_unfixable_versions") . "<br><br>"
             );
         }
         $confirmation_request_tpl->setVariable(
