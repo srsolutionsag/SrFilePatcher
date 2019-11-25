@@ -217,13 +217,15 @@ class ilSrFilePatcherGUI
         $error_report_generator = new ilFileErrorReportGenerator($this);
         $error_report = $error_report_generator->getReport($file);
 
-        $this->fixDatabaseEntryOfFile($file, $error_report);
-        $this->fixHistoryEntriesOfFile($file, $error_report);
-        $this->fixFilesystemVersionsOfFile($file, $error_report);
+        // $this->fixDatabaseEntryOfFile($file, $error_report);
+        // $this->fixHistoryEntriesOfFile($file, $error_report);
+        // $this->fixFilesystemVersionsOfFile($file, $error_report);
 
-        // TODO: query if changes should be shown after patching (perhaps in a before vs. now table)
-        ilUtil::sendSuccess($this->pl->txt("success_file_patched"));
-        $this->ctrl->redirectByClass(self::class, self::CMD_DEFAULT);
+        ilUtil::sendSuccess(sprintf($this->pl->txt("success_file_patched"), $_POST['ref_id_file']), true);
+        $patch_report_generator = new ilFilePatchReportGenerator($this, $error_report);
+        $patch_report_html = $patch_report_generator->getReportHTML();
+        $this->tpl->setContent($patch_report_html);
+        // $this->ctrl->redirectByClass(self::class, self::CMD_DEFAULT);
     }
 
 

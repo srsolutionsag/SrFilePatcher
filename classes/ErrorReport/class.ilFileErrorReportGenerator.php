@@ -143,25 +143,25 @@ class ilFileErrorReportGenerator
 
         // db report
         $db_report_tpl = new ilTemplate("tpl.file_error_report_db_section.html", true, true, ilSrFilePatcherGUI::TEMPLATE_DIR);
-        $db_report_tpl->setVariable("DB_REPORT_TITLE", $this->pl->txt("error_report_title_db_report"));
+        $db_report_tpl->setVariable("DB_REPORT_TITLE", $this->pl->txt("report_title_db_report"));
         $db_report_tpl->setVariable(
             "DB_REPORT_LABEL_CURRENT_VERSION",
-            $this->pl->txt("error_report_label_db_current_version") . ":"
+            $this->pl->txt("report_label_db_current_version") . ":"
         );
         $db_report_tpl->setVariable("DB_REPORT_CONTENT_CURRENT_VERSION", $error_report['db_current_version']);
         $db_report_tpl->setVariable(
             "DB_REPORT_LABEL_CORRECT_VERSION",
-            $this->pl->txt("error_report_label_db_correct_version") . ":"
+            $this->pl->txt("report_label_db_correct_version") . ":"
         );
         $db_report_tpl->setVariable("DB_REPORT_CONTENT_CORRECT_VERSION", $error_report['db_correct_version']);
         $db_report_tpl->setVariable(
             "DB_REPORT_LABEL_CURRENT_MAX_VERSION",
-            $this->pl->txt("error_report_label_db_current_max_version") . ":"
+            $this->pl->txt("report_label_db_current_max_version") . ":"
         );
         $db_report_tpl->setVariable("DB_REPORT_CONTENT_CURRENT_MAX_VERSION", $error_report['db_current_max_version']);
         $db_report_tpl->setVariable(
             "DB_REPORT_LABEL_CORRECT_MAX_VERSION",
-            $this->pl->txt("error_report_label_db_correct_max_version") . ":"
+            $this->pl->txt("report_label_db_correct_max_version") . ":"
         );
         $db_report_tpl->setVariable("DB_REPORT_CONTENT_CORRECT_MAX_VERSION", $error_report['db_correct_max_version']);
 
@@ -187,16 +187,16 @@ class ilFileErrorReportGenerator
         $version_report_table_tpl->setVariable("DB_REPORT", $db_report_tpl->get());
         $version_report_table_tpl->setVariable(
             "REPORT_TABLE_TITLE",
-            $this->pl->txt("error_report_title_version_report")
+            $this->pl->txt("report_title_version_report")
         );
         $version_report_table_tpl->setVariable(
             "REPORT_TABLE_LABEL_FILE_DIR",
-            $this->pl->txt("error_report_label_file_dir") . ":"
+            $this->pl->txt("report_label_file_dir") . ":"
         );
         $version_report_table_tpl->setVariable("REPORT_TABLE_CONTENT_FILE_DIR", ($file_dir . "..."));
         $version_report_table_tpl->setVariable(
             "REPORT_TABLE_INFO_FILE_DIR",
-            $this->pl->txt("error_report_info_file_dir")
+            $this->pl->txt("report_info_file_dir")
         );
         $version_report_table_tpl->setContent($version_report_table->getHTML());
         $error_report_tpl->setVariable("REPORT_TABLE", $version_report_table_tpl->get());

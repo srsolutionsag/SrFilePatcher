@@ -11,6 +11,8 @@ error_plugin_not_activated#:#Error: Plugin not activated.
 error_no_patching_mode#:#Error: No patching mode declared. Modes can be selected inside the plugin configuration.
 error_no_file_for_ref_id#:# No file found for ref_id %s. Please insert a valid ref_id.
 
+success_file_patched#:#The file with ref-id %s has been patched successfully. Fixable versions have been patched, unfixable ones have been marked as lost.
+
 form_title_single_file_patcher#:#Patch Single File
 form_input_ref_id_file#:#Ref-Id of File
 form_cmd_button_show_report#:#Show Error Report
@@ -18,20 +20,29 @@ form_cmd_button_show_report#:#Show Error Report
 tab_single_file_tester#:#Single File Tester
 
 error_report_title#:#Error Report for File with Ref-Id %s
-error_report_title_version_report#:#Report Concerning the Individual Versions
-error_report_title_db_report#:#Report Concerning the Information Stored in the Database
-error_report_label_db_current_version#:#Current Database Entry for Version
-error_report_label_db_correct_version#:#Correct Database Entry for Version
-error_report_label_db_current_max_version#:#Current Database Entry for Max-Version
-error_report_label_db_correct_max_version#:#Correct Database Entry for Max-Version
-error_report_label_file_dir#:#ILIAS File Directory
-error_report_info_file_dir#:#Directory in which files are stored. The paths in the following table start here.
+patch_report_title#:#Patch Report for File with Ref-Id %s
+title_version_report#:#Report Concerning the Individual Versions
+title_db_report#:#Report Concerning the Information Stored in the Database
+report_label_db_current_version#:#Current Database Entry for Version
+report_label_db_correct_version#:#Correct Database Entry for Version
+report_label_db_patched_version#:#Patched Database Entry for Version
+report_label_db_previous_version#:#Previous Database Entry for Version
+report_label_db_current_max_version#:#Current Database Entry for Max-Version
+report_label_db_correct_max_version#:#Correct Database Entry for Max-Version
+report_label_db_patched_max_version#:#Patched Database Entry for Max-Version
+report_label_db_previous_max_version#:#Previous Database Entry for Max-Version
+report_label_file_dir#:#ILIAS File Directory
+report_info_file_dir#:#Directory in which files are stored. The paths in the following table start here.
 
 table_column_current_version#:#Current Version
 table_column_correct_version#:#Correct Version
+table_column_patched_version#:#Patched Version
+table_column_previous_version#:#Previous Version
 table_column_uploaded_by#:#Uploaded by
 table_column_current_path#:#Current Path
 table_column_correct_path#:#Correct Path
+table_column_patched_path#:#Patched Path
+table_column_previous_path#:#Previous Path
 table_column_numbered_correctly#:#Numbered Correctly
 table_column_stored_correctly#:#Stored Correctly
 table_column_folder_exists#:#Folder Exists
