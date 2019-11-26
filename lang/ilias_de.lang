@@ -20,6 +20,7 @@ form_cmd_button_show_report#:#Fehlerbericht anzeigen
 tab_single_file_tester#:#Einzeldatei-Tester
 
 error_report_title#:#Fehlerbericht für die Datei mit der Ref-Id %s
+patch_report_title#:#Patch-Bericht für die Datei mit der Ref-Id %s
 report_title_version_report#:#Bericht bezüglich der einzelnen Versionen
 report_title_db_report#:#Bericht bezüglich der in der Datenbank gespeicherten Informationen
 report_label_db_current_version#:#Derzeitiger Datenbankeintrag für die Version

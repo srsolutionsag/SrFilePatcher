@@ -21,8 +21,8 @@ tab_single_file_tester#:#Single File Tester
 
 error_report_title#:#Error Report for File with Ref-Id %s
 patch_report_title#:#Patch Report for File with Ref-Id %s
-title_version_report#:#Report Concerning the Individual Versions
-title_db_report#:#Report Concerning the Information Stored in the Database
+report_title_version_report#:#Report Concerning the Individual Versions
+report_title_db_report#:#Report Concerning the Information Stored in the Database
 report_label_db_current_version#:#Current Database Entry for Version
 report_label_db_correct_version#:#Correct Database Entry for Version
 report_label_db_patched_version#:#Patched Database Entry for Version

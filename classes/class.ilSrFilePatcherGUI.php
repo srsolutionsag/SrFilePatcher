@@ -40,6 +40,10 @@ class ilSrFilePatcherGUI
      */
     private $ctrl;
     /**
+     * @var ilDBInterface
+     */
+    private $db;
+    /**
      * @var ilLanguage
      */
     private $lng;
@@ -61,9 +65,13 @@ class ilSrFilePatcherGUI
     private $tpl;
 
 
+    /**
+     * ilSrFilePatcherGUI constructor.
+     */
     public function __construct()
     {
         $this->ctrl = self::dic()->ctrl();
+        $this->db = self::dic()->database();
         $this->lng = self::dic()->language();
         $this->log = self::dic()->log();
         $this->pl = ilSrFilePatcherPlugin::getInstance();
@@ -217,15 +225,14 @@ class ilSrFilePatcherGUI
         $error_report_generator = new ilFileErrorReportGenerator($this);
         $error_report = $error_report_generator->getReport($file);
 
-        // $this->fixDatabaseEntryOfFile($file, $error_report);
-        // $this->fixHistoryEntriesOfFile($file, $error_report);
-        // $this->fixFilesystemVersionsOfFile($file, $error_report);
+        $this->fixDatabaseEntryOfFile($file, $error_report);
+        $this->fixHistoryEntriesOfFile($file, $error_report);
+        $this->fixFilesystemVersionsOfFile($file, $error_report);
 
         ilUtil::sendSuccess(sprintf($this->pl->txt("success_file_patched"), $_POST['ref_id_file']), true);
         $patch_report_generator = new ilFilePatchReportGenerator($this, $error_report);
         $patch_report_html = $patch_report_generator->getReportHTML();
         $this->tpl->setContent($patch_report_html);
-        // $this->ctrl->redirectByClass(self::class, self::CMD_DEFAULT);
     }
 
 
@@ -234,9 +241,9 @@ class ilSrFilePatcherGUI
      * @param array     $a_error_report
      */
     private function fixDatabaseEntryOfFile(ilObjFile &$a_file, array $a_error_report) {
-        $tst = 0;
-        // $a_file->setVersion($a_error_report['correct_version']); TODO: comment in after testing
-        // $a_file->setMaxVersion($a_error_report['correct_max_version']);
+        $a_file->setVersion($a_error_report['db_correct_version']);
+        $a_file->setMaxVersion($a_error_report['db_correct_max_version']);
+        $a_file->update();
     }
 
 
@@ -244,10 +251,11 @@ class ilSrFilePatcherGUI
      * @param ilObjFile $a_file
      * @param array     $a_error_report
      */
-    private function fixHistoryEntriesOfFile(ilObjFile $a_file, array $a_error_report) {
+    private function fixHistoryEntriesOfFile(ilObjFile $a_file, array &$a_error_report) {
         $broken_history_entries = $this->getVersionsFromHistoryOfFile($a_file);
 
         foreach ($broken_history_entries as $broken_history_entry) {
+            $hist_entry_id = $broken_history_entry['hist_entry_id'];
             foreach ($a_error_report as $error_report_entry) {
                 if(isset($error_report_entry['hist_entry_id'])
                     && ($error_report_entry['hist_entry_id']) == $broken_history_entry['hist_entry_id']) {
@@ -255,28 +263,18 @@ class ilSrFilePatcherGUI
                     if($error_report_entry['patch_possible']) {
                         // obtain data for fixing the history entry
                         $fixed_info_params = $this->getFixedInfoParams($broken_history_entry, $error_report_entry);
-                        $fixed_history_entry = $broken_history_entry;
-                        $fixed_history_entry['info_params'] = $fixed_info_params;
-                        // overwrite existing history entry with correct data
-                        // ilHistory::_createEntry( TODO: comment in after testing
-                        //     $fixed_history_entry['obj_id'],
-                        //     $fixed_history_entry['action'],
-                        //     $fixed_history_entry['info_params'],
-                        //     $fixed_history_entry['obj_type'],
-                        //     $fixed_history_entry['user_comment'],
-                        //     true
-                        // );
+                        // fix history entry with correct info params
+                        $update_query_info_params =
+                            "UPDATE history SET info_params = " . $this->db->quote($fixed_info_params, "text")
+                            . "WHERE id = " . $this->db->quote($hist_entry_id, "integer");
+                        $this->db->query($update_query_info_params);
                     } else {
                         // mark version as lost
-                        $broken_history_entry['action'] = "lost";
-                        // ilHistory::_createEntry( TODO: comment in after testing
-                        //     $broken_history_entry['obj_id'],
-                        //     $broken_history_entry['action'],
-                        //     $broken_history_entry['info_params'],
-                        //     $broken_history_entry['obj_type'],
-                        //     $broken_history_entry['user_comment'],
-                        //     true
-                        // );
+                        $action_lost = "lost";
+                        $update_query_action =
+                            "UPDATE history SET action = " . $this->db->quote($action_lost, "text")
+                            . "WHERE id = " . $this->db->quote($hist_entry_id, "integer");
+                        $this->db->query($update_query_action);
                     }
                 }
             }
@@ -297,6 +295,12 @@ class ilSrFilePatcherGUI
                 $current_path = $error_report_entry['current_path'];
                 $correct_path = $error_report_entry['correct_path'];
 
+                $correct_path_without_filename = str_replace($error_report_entry['filename'], "", $correct_path);
+                // create directories of correct path if they don't yet exist
+                if(!is_dir($correct_path_without_filename)) {
+                    mkdir($correct_path_without_filename, 0755, true);
+                }
+
                 // rename the file to be moved in case a name-duplicate exists in its correct path to prevent overwriting.
                 // (the renaming will be undone once the name duplicate has been moved too)
                 if(file_exists($correct_path)) {
@@ -304,7 +308,7 @@ class ilSrFilePatcherGUI
                 }
 
                 // move the file to its correct location
-                // rename($current_path, $correct_path);TODO: comment in after testing
+                rename($current_path, $correct_path);
             }
         }
 
@@ -328,7 +332,7 @@ class ilSrFilePatcherGUI
             if (count($files_with_appendix) > 0) {
                 foreach ($files_with_appendix as $file_with_appendix) {
                     $file_without_appendix = str_replace(self::TEMP_APPENDIX, "", $file_with_appendix);
-                    // rename($file_with_appendix, $file_without_appendix);TODO: comment in after testing
+                    rename($file_with_appendix, $file_without_appendix);
                 }
             }
 
@@ -345,9 +349,9 @@ class ilSrFilePatcherGUI
                     }
                 }
             }
-            // if(!$matches_any_correct_version) {
-            //     unlink($version_directory);
-            // }TODO: comment in after testing
+            if(!$matches_any_correct_version) {
+                rmdir($version_directory);
+            }
         }
     }
 
