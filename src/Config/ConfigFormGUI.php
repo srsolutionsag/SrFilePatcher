@@ -62,28 +62,5 @@ class ConfigFormGUI extends ActiveRecordConfigFormGUI
     /**
      * @inheritdoc
      */
-    protected function initFields()/*: void*/
-    {
-        $this->fields = [
-            Config::KEY_PATCHING_MODE => [
-                self::PROPERTY_CLASS    => ilRadioGroupInputGUI::class,
-                self::PROPERTY_REQUIRED => true,
-                self::PROPERTY_SUBITEMS => [
-                    Config::KEY_MODE_SINGLE_FILE => [
-                        self::PROPERTY_CLASS    => ilRadioOption::class,
-                        self::PROPERTY_SUBITEMS => [
-                            Config::KEY_REF_ID_FILE => [
-                                self::PROPERTY_CLASS    => ilNumberInputGUI::class,
-                                self::PROPERTY_REQUIRED => true
-                            ]
-                        ]
-                    ],
-                    Config::KEY_MODE_ALL_FILES => [
-                        self::PROPERTY_CLASS    => ilRadioOption::class
-                    ]
-                ],
-                "setInfo" => self::txt("info_patching_mode")
-            ]
-        ];
-    }
+    protected function initFields()/*: void*/ {}
 }

@@ -1,11 +1,6 @@
 config_configuration#:#Configuration
 config_configuration_saved#:#Configuration saved
 config_save#:#Save
-config_patching_mode#:#Patching Mode
-config_patching_mode_single_file#:#Single File
-config_ref_id_file#:#Ref-Id of File
-config_patching_mode_all_files#:#All Files
-config_info_patching_mode#:#Warning: The plugin should always be thoroughly tested on a single file before being used on all files!
 
 error_plugin_not_activated#:#Error: Plugin not activated.
 error_no_patching_mode#:#Error: No patching mode declared. Modes can be selected inside the plugin configuration.
