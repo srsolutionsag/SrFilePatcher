@@ -103,7 +103,7 @@ class ilFileErrorReportGenerator
                 $report[$hist_entry_id]['folder_exists'] = true;
             }
 
-            if (in_array($version, $lost_versions)) {
+            if (in_array($version, $lost_versions) || $version['action'] === "lost") {
                 $report[$hist_entry_id]['file_exists'] = false;
                 $report[$hist_entry_id]['patch_possible'] = false;
                 $report[$hist_entry_id]['current_path'] = "-";

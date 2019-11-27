@@ -271,9 +271,11 @@ class ilSrFilePatcherGUI
                             . "WHERE id = " . $this->db->quote($hist_entry_id, "integer");
                         $this->db->query($update_query_info_params);
                     } else {
-                        // mark version as lost
+                        // mark version as lost but still fix history versions to prevent duplicates from showing in version view
+                        $fixed_info_params = $this->getFixedInfoParams($broken_history_entry, $error_report_entry);
                         $update_query_action =
                             "UPDATE history SET action = " . $this->db->quote("lost", "text")
+                            . ", info_params = " . $this->db->quote($fixed_info_params, "text")
                             . ", user_comment = " . $this->db->quote($patched_comment, "text")
                             . "WHERE id = " . $this->db->quote($hist_entry_id, "integer");
                         $this->db->query($update_query_action);
