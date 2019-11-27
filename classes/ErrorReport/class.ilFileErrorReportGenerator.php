@@ -260,7 +260,13 @@ class ilFileErrorReportGenerator
         $highest_old_version = $this->getHighestVersion($old_versions);
         foreach ($new_versions as $new_version) {
             $extended_version = $new_version;
-            $extended_version['correct_version'] = $new_version['version'] + $highest_old_version - 1;;
+            // only calculate the correct version when the file hasn't been patched yet
+            // as re-calculation after patching would cause the version to be higher than its actual correct value
+            if(strpos($extended_version['user_comment'], "patched") != false) {
+                $extended_version['correct_version'] = $new_version['version'] + $highest_old_version - 1;
+            } else {
+                $extended_version['correct_version'] = $new_version['version'];
+            }
             $extended_version['current_path'] = $this->getCurrentPathForVersion($extended_version, $a_file);
             $extended_version['correct_path'] = $this->getCorrectPathForVersion($extended_version, $a_file);
             $extended_versions[] = $extended_version;
@@ -413,7 +419,24 @@ class ilFileErrorReportGenerator
         $highest_old_version = $this->getHighestVersion($old_versions);
         $highest_new_version = $this->getHighestVersion($new_versions);
 
-        return $correct_max_version = $highest_old_version + $highest_new_version - 1;
+        $highest_new_version_entry = null;
+        foreach ($versions as $version) {
+            if($version['version'] == $highest_new_version) {
+                $highest_new_version_entry = $version;
+            }
+        }
+
+        // only calculate the correct max version when the file hasn't been patched yet
+        // as re-calculation after patching would cause the max-version to be higher than its actual correct value
+        if($highest_new_version_entry !== null
+            && strpos($highest_new_version_entry['user_comment'], "patched") != false
+        ) {
+            $correct_max_version = $highest_old_version + $highest_new_version - 1;
+        } else {
+            $correct_max_version = $highest_new_version;
+        }
+
+        return $correct_max_version;
     }
 
 

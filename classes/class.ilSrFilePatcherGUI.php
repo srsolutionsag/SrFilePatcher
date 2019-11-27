@@ -256,6 +256,7 @@ class ilSrFilePatcherGUI
 
         foreach ($broken_history_entries as $broken_history_entry) {
             $hist_entry_id = $broken_history_entry['hist_entry_id'];
+            $patched_comment = "patched: " . ilUtil::now();
             foreach ($a_error_report as $error_report_entry) {
                 if(isset($error_report_entry['hist_entry_id'])
                     && ($error_report_entry['hist_entry_id']) == $broken_history_entry['hist_entry_id']) {
@@ -263,16 +264,17 @@ class ilSrFilePatcherGUI
                     if($error_report_entry['patch_possible']) {
                         // obtain data for fixing the history entry
                         $fixed_info_params = $this->getFixedInfoParams($broken_history_entry, $error_report_entry);
-                        // fix history entry with correct info params
+                        // fix history entry with correct info params and mark it as patched
                         $update_query_info_params =
                             "UPDATE history SET info_params = " . $this->db->quote($fixed_info_params, "text")
+                            . ", user_comment = " . $this->db->quote($patched_comment, "text")
                             . "WHERE id = " . $this->db->quote($hist_entry_id, "integer");
                         $this->db->query($update_query_info_params);
                     } else {
                         // mark version as lost
-                        $action_lost = "lost";
                         $update_query_action =
-                            "UPDATE history SET action = " . $this->db->quote($action_lost, "text")
+                            "UPDATE history SET action = " . $this->db->quote("lost", "text")
+                            . ", user_comment = " . $this->db->quote($patched_comment, "text")
                             . "WHERE id = " . $this->db->quote($hist_entry_id, "integer");
                         $this->db->query($update_query_action);
                     }
