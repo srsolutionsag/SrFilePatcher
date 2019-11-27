@@ -262,7 +262,7 @@ class ilFileErrorReportGenerator
             $extended_version = $new_version;
             // only calculate the correct version when the file hasn't been patched yet
             // as re-calculation after patching would cause the version to be higher than its actual correct value
-            if(strpos($extended_version['user_comment'], "patched") != false) {
+            if(strpos($extended_version['user_comment'], "patched") === false) {
                 $extended_version['correct_version'] = $new_version['version'] + $highest_old_version - 1;
             } else {
                 $extended_version['correct_version'] = $new_version['version'];
@@ -429,7 +429,7 @@ class ilFileErrorReportGenerator
         // only calculate the correct max version when the file hasn't been patched yet
         // as re-calculation after patching would cause the max-version to be higher than its actual correct value
         if($highest_new_version_entry !== null
-            && strpos($highest_new_version_entry['user_comment'], "patched") != false
+            && strpos($highest_new_version_entry['user_comment'], "patched") === false
         ) {
             $correct_max_version = $highest_old_version + $highest_new_version - 1;
         } else {
@@ -571,6 +571,15 @@ class ilFileErrorReportGenerator
         $file_directory = $a_file->getDirectory();
         $file_name = $a_version['filename'];
         $correct_version = $a_version['correct_version'];
+        // if the version is a rollback the rollback parameters (appended after |) have to be removed
+        // to prevent the correct path from always being "-"
+        if(strpos($correct_version, "|") > 0) {
+            $correct_version = substr(
+                $a_version['correct_version'],
+                0,
+                strpos($a_version['correct_version'], "|")
+            );
+        }
 
         $version_directory = "000";
         if (strlen($correct_version) === 1) {
