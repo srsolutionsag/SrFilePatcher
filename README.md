@@ -1,5 +1,7 @@
 This is an OpenSource project by studer + raimann ag, CH-Burgdorf (https://studer-raimann.ch)
 
+> ATTENTION: This plugin does not guarantee that a patch will be successful. It can lead to file loss. No liability is assumed.
+
 ## Description
 See in [doc/DESCRIPTION.md](./doc/DESCRIPTION.md)
 
@@ -24,7 +26,7 @@ Update, activate and config the plugin in the ILIAS Plugin Administration
 ### Adjustment suggestions
 * External users can report suggestions and bugs at https://plugins.studer-raimann.ch/goto.php?target=uihk_srsu_
 * Adjustment suggestions by pull requests via github
-* Customer of studer + raimann ag: 
+* Customer of studer + raimann ag:
 	* Adjustment suggestions which are not yet worked out in detail by Jira tasks under https://jira.studer-raimann.ch/projects/
 	* Bug reports under https://jira.studer-raimann.ch/projects/
 
