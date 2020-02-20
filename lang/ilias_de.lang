@@ -1,3 +1,53 @@
 config_configuration#:#Konfiguration
 config_configuration_saved#:#Konfiguration gespeichert
 config_save#:#Speichern
+
+error_plugin_not_activated#:#Fehler: Plugin nicht aktiviert.
+error_no_patching_mode#:#Fehler: Kein Reparatur-Modus angegeben. Modi können in der Plugin Konfiguration ausgewählt werden.
+error_no_file_for_ref_id#:# Keine Datei mit der ref_id %s gefunden. Bitte geben Sie eine gültige Ref-Id an.
+
+success_file_patched#:#Die Datei mit der Ref-Id %s wurde erfolgreich gepatcht. Reparable Versionen wurden gepatcht und irreparable Verionen wurden als verloren markiert.
+
+form_title_single_file_patcher#:#Patche einzelne Datei
+form_input_ref_id_file#:#Ref-Id der Datei
+form_cmd_button_show_report#:#Fehlerbericht anzeigen
+
+tab_single_file_tester#:#Einzeldatei-Tester
+
+error_report_title#:#Fehlerbericht für die Datei mit der Ref-Id %s
+patch_report_title#:#Patch-Bericht für die Datei mit der Ref-Id %s
+report_title_version_report#:#Bericht bezüglich der einzelnen Versionen
+report_title_db_report#:#Bericht bezüglich der in der Datenbank gespeicherten Informationen
+report_label_db_current_version#:#Derzeitiger Datenbankeintrag für die Version
+report_label_db_correct_version#:#Korrekter Datenbankeintrag für die Version
+report_label_db_patched_version#:#Gepatchter Datenbankeintrag für die Version
+report_label_db_previous_version#:#Vorheriger Datenbankeintrag für die Version
+report_label_db_current_max_version#:#Derzeitiger Datenbankeintrag für die Max-Version
+report_label_db_correct_max_version#:#Korrekter Datenbankeintrag für die Max-Version
+report_label_db_patched_max_version#:#Gepatchter Datenbankeintrag für die Max-Version
+report_label_db_previous_max_version#:#Vorheriger Datenbankeintrag für die Max-Version
+report_label_file_dir#:#ILIAS Dateiverzeichnis
+report_info_file_dir#:#Verzeichnis in welchem Dateien gespeichert werden. Die Pfade in nachfolgender Tabelle beginnen hier.
+
+table_column_current_version#:#Derzeitige Version
+table_column_correct_version#:#Korrekte Version
+table_column_patched_version#:#Gepatchte Version
+table_column_previous_version#:#Vorherige Version
+table_column_uploaded_by#:#Hochgeladen von
+table_column_current_path#:#Derzeitiger Pfad
+table_column_correct_path#:#Korrekter Pfad
+table_column_patched_path#:#Gepatchter Pfad
+table_column_previous_path#:#Vorheriger Pfad
+table_column_numbered_correctly#:#Korrekt nummeriert
+table_column_stored_correctly#:#Korrekt abgelegt
+table_column_folder_exists#:#Ordner vorhanden
+table_column_file_exists#:#Datei vorhanden
+table_column_patch_possible#:#Patch möglich
+
+table_cmd_button_patch#:#Patchen
+
+confirmation_question_patch#:#Wollen Sie die Datei mit der Ref-Id %s wirklich patchen? Dabei würden reparable Versionen gepatcht und irreparable Versionen als verloren markiert.
+confirmation_table_title_fixable_versions#:#Reparable Versionen
+confirmation_table_title_unfixable_versions#:#Irreparable Versionen
+confirmation_table_replacement_no_fixable_versions#:#Keine reparablen Versionen vorhanden
+confirmation_table_replacement_no_unfixable_versions#:#Keine irreparablen Versionen vorhanden

@@ -7,7 +7,15 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'SrFilePatcherRemoveDataConfirm' => $baseDir . '/classes/uninstall/class.SrFilePatcherRemoveDataConfirm.php',
+    'ilFileErrorReportGenerator' => $baseDir . '/classes/ErrorReport/class.ilFileErrorReportGenerator.php',
+    'ilFileErrorReportTableGUI' => $baseDir . '/classes/ErrorReport/class.ilFileErrorReportTableGUI.php',
+    'ilFilePatchConfirmationRequestGenerator' => $baseDir . '/classes/PatchConfirmationRequest/class.ilFilePatchConfirmationRequestGenerator.php',
+    'ilFilePatchConfirmationRequestTableGUI' => $baseDir . '/classes/PatchConfirmationRequest/class.ilFilePatchConfirmationRequestTableGUI.php',
+    'ilFilePatchReportGenerator' => $baseDir . '/classes/PatchReport/class.ilFilePatchReportGenerator.php',
+    'ilFilePatchReportTableGUI' => $baseDir . '/classes/PatchReport/class.ilFilePatchReportTableGUI.php',
     'ilSrFilePatcherConfigGUI' => $baseDir . '/classes/class.ilSrFilePatcherConfigGUI.php',
+    'ilSrFilePatcherFormGUI' => $baseDir . '/classes/class.ilSrFilePatcherFormGUI.php',
+    'ilSrFilePatcherGUI' => $baseDir . '/classes/class.ilSrFilePatcherGUI.php',
     'ilSrFilePatcherPlugin' => $baseDir . '/classes/class.ilSrFilePatcherPlugin.php',
     'srag\\ActiveRecordConfig\\SrFilePatcher\\ActiveRecordConfig' => $vendorDir . '/srag/activerecordconfig/src/ActiveRecordConfig.php',
     'srag\\ActiveRecordConfig\\SrFilePatcher\\ActiveRecordConfigFormGUI' => $vendorDir . '/srag/activerecordconfig/src/ActiveRecordConfigFormGUI.php',
