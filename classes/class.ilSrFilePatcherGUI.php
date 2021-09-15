@@ -99,7 +99,6 @@ class ilSrFilePatcherGUI
 
         $this->ctrl->saveParameterByClass(ilSrFilePatcherGUI::class, "ref_id");
         $next_class = self::dic()->ctrl()->getNextClass($this);
-        $this->tpl->loadStandardTemplate();
 
         switch (strtolower($next_class)) {
             case strtolower(ilObjComponentSettingsGUI::class):

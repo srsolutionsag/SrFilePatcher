@@ -189,7 +189,7 @@ class ilFilePatchReportGenerator
             "REPORT_TABLE_INFO_FILE_DIR",
             $this->pl->txt("report_info_file_dir")
         );
-        $version_report_table_tpl->setContent($version_report_table->getHTML());
+        $version_report_table_tpl->setVariable('TBL_CONTENT', $version_report_table->getHTML());
         $patch_report_tpl->setVariable("REPORT_TABLE", $version_report_table_tpl->get());
 
         return $patch_report_tpl->get();
